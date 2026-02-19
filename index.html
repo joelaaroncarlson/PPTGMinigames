@@ -622,101 +622,386 @@ function renderHumbots() {
 
 // ── Mission Script Editor ──────────────────────────────────────────
 const SCRIPT_DATA = [
-  {t:'noninteractive', x:'[ LETTERBOX IN — Non-Interactive Mode ]'},
-  {t:'scene', x:'EXT. ADVENTURE BAY - JET SKI RACE DOCK - DAY'},
-  {t:'action', x:'MAYOR GOODWAY stands at the dock podium, eyes closed, beaming. Gleaming jet skis float on the water in front of her.'},
-  {t:'character', x:'MAYOR GOODWAY'},
-  {t:'dialogue', x:'Welcome to the Adventure Bay Jet Ski Race!'},
-  {t:'transition', x:'CUT TO:'},
-  {t:'scene', x:'EXT. ADVENTURE BAY - DOCK - CONTINUOUS'},
-  {t:'action', x:'MAYOR HUMDINGER stands over a large wooden crate. He flings it open. HUMBOTS pour out — two-foot-tall robots with springy arms, purple top hats, and glowing green eyes.'},
-  {t:'character', x:'MAYOR HUMDINGER'},
-  {t:'dialogue', x:'My Humbots are programmed to steal anything and return it to Foggy Bottom! HAHAHAHA!'},
-  {t:'action', x:'The Humbots turn toward the jet skis. They chant in perfect unison, marching.'},
-  {t:'character', x:'HUMBOTS'},
-  {t:'parenthetical', x:'(in unison)'},
-  {t:'dialogue', x:'Steal everything! Steal everything!'},
-  {t:'action', x:'They grab the jet skis and roar away. One rides backwards. One stands with its spring arms spread wide like it\'s surfing. One clutches a stolen flag.'},
-  {t:'transition', x:'CUT BACK TO:'},
-  {t:'scene', x:'EXT. ADVENTURE BAY - JET SKI RACE DOCK - CONTINUOUS'},
-  {t:'action', x:'MAYOR GOODWAY opens her eyes. The jet skis are gone. She stares directly into camera. A long beat.'},
-  {t:'character', x:'MAYOR GOODWAY'},
-  {t:'dialogue', x:'Alright, contestant...'},
-  {t:'action', x:'She looks out at the empty water. Then back. Then out again.'},
-  {t:'character', x:'MAYOR GOODWAY'},
-  {t:'dialogue', x:'Wait! WHO STOLE THE JET SKIS!?'},
-  {t:'transition', x:'CUT TO:'},
-  {t:'scene', x:'EXT. ADVENTURE BAY - ON THE WATER - CONTINUOUS'},
-  {t:'action', x:'The HUMBOTS speed away on stolen jet skis, laughing.'},
-  {t:'character', x:'RYDER'},
-  {t:'parenthetical', x:'(O/S)'},
-  {t:'dialogue', x:'Zuma, catch up to those robots!'},
-  {t:'action', x:'Camera PULLS BACK. ZUMA enters frame on his hovercraft, eyes locked on the escaping Humbots.'},
-  {t:'noninteractive', x:'[ LETTERBOX OUT — Game Mode Begins ]'},
-  {t:'game', x:'🎮  GAME 1 — ZUMA: JET SKI CHASE'},
-  {t:'action', x:'Player tilts to steer Zuma\'s hovercraft down the jet ski course. Dodge buoys. Humbots glance back nervously as Zuma closes in.'},
-  {t:'game', x:'— RING TOSS MODE —'},
-  {t:'action', x:'Rocky\'s tugboat pulls up alongside Zuma. The Humbots panic and begin spinning in tight circles on their stolen jet skis.'},
-  {t:'action', x:'Player taps each circling Humbot to launch a ring from the front of Zuma\'s hovercraft. A direct hit: the Humbot freezes, eyes wide — then YOINK — yanked into the air and dropped into Rocky\'s tugboat.'},
-  {t:'character', x:'ROCKY'},
-  {t:'dialogue', x:'Don\'t lose it, reuse it!'},
-  {t:'action', x:'After 3-5 successful captures, MAYOR HUMDINGER watches from his lifeguard stand.'},
-  {t:'character', x:'MAYOR HUMDINGER'},
-  {t:'parenthetical', x:'(hollering from stand)'},
-  {t:'dialogue', x:'Humbots! Ditch the jet skis and HIDE!'},
-  {t:'game', x:'END GAME 1'},
-  {t:'transition', x:'CUT TO:'},
-  {t:'scene', x:'EXT. ADVENTURE BAY BEACH - MOMENTS LATER'},
-  {t:'action', x:'The remaining HUMBOTS beach the jet skis and scramble up the sand. They look left. They look right. Then they dig straight down into the beach. Within seconds, only their antennae are visible, poking up through the sand.'},
-  {t:'character', x:'RYDER'},
-  {t:'dialogue', x:'Rubble! They\'re buried on the beach — use your magnetic crane attachment!'},
-  {t:'game', x:'🎮  GAME 2 — RUBBLE: MAGNET WHACK-A-MOLE'},
-  {t:'action', x:'A 5x5 grid of sand mounds fills the screen. Rubble\'s magnetic crane hangs overhead, glowing with a soft purple light. Humbots peek up from random mounds, checking if the coast is clear.'},
-  {t:'action', x:'TAP a peeking Humbot → the magnet fires a beam downward → ZAP — the Humbot shoots straight up to the magnet, spring arms flailing. Miss and the Humbot ducks back down, laughing.'},
-  {t:'character', x:'MAYOR HUMDINGER'},
-  {t:'parenthetical', x:'(from lifeguard stand, watching)'},
-  {t:'dialogue', x:'Too slow! Ha ha ha!'},
-  {t:'action', x:'Round 1: 3x3 grid, 1 active Humbot. Round 2: 4x4 grid, 2 active. Round 3: full 5x5, 2-3 active, faster peek windows.'},
-  {t:'game', x:'END GAME 2'},
-  {t:'transition', x:'CUT TO:'},
-  {t:'scene', x:'EXT. ADVENTURE BAY BEACH - LIFEGUARD STAND - CONTINUOUS'},
-  {t:'action', x:'RYDER walks up to the base of the 12-foot lifeguard stand and looks up at HUMDINGER, who clings to his chair.'},
-  {t:'character', x:'RYDER'},
-  {t:'dialogue', x:'Humdinger — did YOU create these robots?'},
-  {t:'character', x:'MAYOR HUMDINGER'},
-  {t:'dialogue', x:'What!? Create the Humbots? I\'ve just been in this lifeguard stand the whole time trying to enjoy the jet ski race!'},
-  {t:'action', x:'Three HUMBOTS erupt from the sand at the base of the tower. They grab the support pieces from each 4-foot section — bottom, middle, top — and yank them free.'},
-  {t:'action', x:'The 12-foot lifeguard stand begins to sway. Left. Right. Left. Right. HUMDINGER grips his chair with both hands, crying. The tower rocks like a metronome.'},
-  {t:'character', x:'RYDER'},
-  {t:'dialogue', x:'Rocky! We need you!'},
-  {t:'game', x:'🎮  GAME 3 — ROCKY: FIX THE LIFEGUARD TOWER'},
-  {t:'action', x:'ROCKY stands on the beach below the swaying tower. His pup pack deploys — the retractable claw extends outward, ready. Three pieces lie in the sand nearby, each with a HUMBOT still clinging to it stubbornly.'},
-  {t:'action', x:'The tower sways continuously. HUMDINGER whimpers at the top. Each 4-foot section has a gap where its support piece belongs.'},
-  {t:'action', x:'BOTTOM PIECE (0-4 ft): Close range. Easy timing. Claw grabs piece — Humbot dangles, wriggling. Match shape to the gap in the bottom section. Piece snaps in. Humbot lets go and drops to beach. SPLAT. Stars circle its head.'},
-  {t:'action', x:'MIDDLE PIECE (4-8 ft): Claw extends further. Humbot grips tighter. Tower sways more. Match shape to middle section gap. Piece snaps in. Second Humbot drops. SPLAT.'},
-  {t:'action', x:'TOP PIECE (8-12 ft): Full extension. Biggest sway arc. Humbot clinging with all four spring arms. Match shape to top section gap. Piece snaps in. Third Humbot drops from 12 feet. SPLAT. Extra big stars.'},
-  {t:'action', x:'The tower steadies. HUMDINGER exhales and smooths his jacket with great dignity.'},
-  {t:'character', x:'ROCKY'},
-  {t:'dialogue', x:'There! Good as new. Better, actually — that middle piece is recycled from a surfboard.'},
-  {t:'game', x:'END GAME 3'},
-  {t:'transition', x:'CUT TO:'},
-  {t:'scene', x:'EXT. ADVENTURE BAY BEACH - CONTINUOUS'},
-  {t:'action', x:'The lifeguard stand stands perfectly straight. MAYOR GOODWAY arrives, fanning herself.'},
-  {t:'character', x:'MAYOR GOODWAY'},
-  {t:'dialogue', x:'Now THAT was a rescue worth watching!'},
-  {t:'character', x:'MAYOR HUMDINGER'},
-  {t:'dialogue', x:'Hmph. Well... I suppose... thank you.'},
-  {t:'action', x:'A lone HUMBOT pops up from the sand, clocks Humdinger\'s top hat, and snatches it. HUMDINGER yelps and leaps from the stand, chasing the Humbot down the beach.'},
-  {t:'action', x:'The pups watch and laugh.'},
-  {t:'character', x:'RYDER'},
-  {t:'dialogue', x:'Great work, team! No job is too big, no pup is too small!'},
-  {t:'transition', x:'CUT TO:'},
-  {t:'scene', x:'EXT. FOGGY BOTTOM - DOCK - MOMENTS LATER'},
-  {t:'action', x:'Rocky\'s tugboat chugs up to Foggy Bottom\'s dock. It tips its hold — a crate of captured HUMBOTS slides out and lands on the pier with a heavy THUNK.'},
-  {t:'action', x:'HUMDINGER walks up, hat now returned. He sees the crate. He opens it. Every single Humbot springs out at once and scatters through his lair in every direction.'},
-  {t:'action', x:'HUMDINGER stares. A long beat. Then: a slow, magnificent face-palm.'},
-  {t:'transition', x:'FADE OUT.'},
-  {t:'noninteractive', x:'[ MISSION COMPLETE — Adventure Bay Jet Ski Race ]'},
+  {
+    "t": "noninteractive",
+    "x": "[ LETTERBOX IN \u2014 Non-Interactive Mode ]"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY - JET SKI RACE DOCK - DAY"
+  },
+  {
+    "t": "action",
+    "x": "MAYOR GOODWAY stands at the dock podium, eyes closed, beaming. Gleaming jet skis float on the water in front of her."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR GOODWAY"
+  },
+  {
+    "t": "dialogue",
+    "x": "Welcome to the Adventure Bay Jet Ski Race! Testing Testing!"
+  },
+  {
+    "t": "transition",
+    "x": "CUT TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY - DOCK - CONTINUOUS"
+  },
+  {
+    "t": "action",
+    "x": "MAYOR HUMDINGER stands over a large wooden crate. He flings it open. HUMBOTS pour out \u2014 two-foot-tall robots with springy arms, purple top hats, and glowing green eyes."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "dialogue",
+    "x": "My Humbots are programmed to steal anything and return it to Foggy Bottom! HAHAHAHA!"
+  },
+  {
+    "t": "action",
+    "x": "The Humbots turn toward the jet skis. They chant in perfect unison, marching."
+  },
+  {
+    "t": "character",
+    "x": "HUMBOTS"
+  },
+  {
+    "t": "parenthetical",
+    "x": "(in unison)"
+  },
+  {
+    "t": "dialogue",
+    "x": "Steal everything! Steal everything!"
+  },
+  {
+    "t": "action",
+    "x": "They grab the jet skis and roar away. One rides backwards. One stands with its spring arms spread wide like it's surfing. One clutches a stolen flag."
+  },
+  {
+    "t": "transition",
+    "x": "CUT BACK TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY - JET SKI RACE DOCK - CONTINUOUS"
+  },
+  {
+    "t": "action",
+    "x": "MAYOR GOODWAY opens her eyes. The jet skis are gone. She stares directly into camera. A long beat."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR GOODWAY"
+  },
+  {
+    "t": "dialogue",
+    "x": "Alright, contestant..."
+  },
+  {
+    "t": "action",
+    "x": "She looks out at the empty water. Then back. Then out again."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR GOODWAY"
+  },
+  {
+    "t": "dialogue",
+    "x": "Wait! WHO STOLE THE JET SKIS!?"
+  },
+  {
+    "t": "transition",
+    "x": "CUT TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY - ON THE WATER - CONTINUOUS"
+  },
+  {
+    "t": "action",
+    "x": "The HUMBOTS speed away on stolen jet skis, laughing."
+  },
+  {
+    "t": "character",
+    "x": "RYDER"
+  },
+  {
+    "t": "parenthetical",
+    "x": "(O/S)"
+  },
+  {
+    "t": "dialogue",
+    "x": "Zuma, catch up to those robots!"
+  },
+  {
+    "t": "action",
+    "x": "Camera PULLS BACK. ZUMA enters frame on his hovercraft, eyes locked on the escaping Humbots."
+  },
+  {
+    "t": "noninteractive",
+    "x": "[ LETTERBOX OUT \u2014 Game Mode Begins ]"
+  },
+  {
+    "t": "game",
+    "x": "\ud83c\udfae  GAME 1 \u2014 ZUMA: JET SKI CHASE"
+  },
+  {
+    "t": "action",
+    "x": "Player tilts to steer Zuma's hovercraft down the jet ski course. Dodge buoys. Humbots glance back nervously as Zuma closes in."
+  },
+  {
+    "t": "game",
+    "x": "\u2014 RING TOSS MODE \u2014"
+  },
+  {
+    "t": "action",
+    "x": "Rocky's tugboat pulls up alongside Zuma. The Humbots panic and begin spinning in tight circles on their stolen jet skis."
+  },
+  {
+    "t": "action",
+    "x": "Player taps each circling Humbot to launch a ring from the front of Zuma's hovercraft. A direct hit: the Humbot freezes, eyes wide \u2014 then YOINK \u2014 yanked into the air and dropped into Rocky's tugboat."
+  },
+  {
+    "t": "character",
+    "x": "ROCKY"
+  },
+  {
+    "t": "dialogue",
+    "x": "Don't lose it, reuse it!"
+  },
+  {
+    "t": "action",
+    "x": "After 3-5 successful captures, MAYOR HUMDINGER watches from his lifeguard stand."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "parenthetical",
+    "x": "(hollering from stand)"
+  },
+  {
+    "t": "dialogue",
+    "x": "Humbots! Ditch the jet skis and HIDE!"
+  },
+  {
+    "t": "game",
+    "x": "END GAME 1"
+  },
+  {
+    "t": "transition",
+    "x": "CUT TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY BEACH - MOMENTS LATER"
+  },
+  {
+    "t": "action",
+    "x": "The remaining HUMBOTS beach the jet skis and scramble up the sand. They look left. They look right. Then they dig straight down into the beach. Within seconds, only their antennae are visible, poking up through the sand."
+  },
+  {
+    "t": "character",
+    "x": "RYDER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Rubble! They're buried on the beach \u2014 use your magnetic crane attachment!"
+  },
+  {
+    "t": "game",
+    "x": "\ud83c\udfae  GAME 2 \u2014 RUBBLE: MAGNET WHACK-A-MOLE"
+  },
+  {
+    "t": "action",
+    "x": "A 5x5 grid of sand mounds fills the screen. Rubble's magnetic crane hangs overhead, glowing with a soft purple light. Humbots peek up from random mounds, checking if the coast is clear."
+  },
+  {
+    "t": "action",
+    "x": "TAP a peeking Humbot \u2192 the magnet fires a beam downward \u2192 ZAP \u2014 the Humbot shoots straight up to the magnet, spring arms flailing. Miss and the Humbot ducks back down, laughing."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "parenthetical",
+    "x": "(from lifeguard stand, watching)"
+  },
+  {
+    "t": "dialogue",
+    "x": "Too slow! Ha ha ha!"
+  },
+  {
+    "t": "action",
+    "x": "Round 1: 3x3 grid, 1 active Humbot. Round 2: 4x4 grid, 2 active. Round 3: full 5x5, 2-3 active, faster peek windows."
+  },
+  {
+    "t": "game",
+    "x": "END GAME 2"
+  },
+  {
+    "t": "transition",
+    "x": "CUT TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY BEACH - LIFEGUARD STAND - CONTINUOUS"
+  },
+  {
+    "t": "action",
+    "x": "RYDER walks up to the base of the 12-foot lifeguard stand and looks up at HUMDINGER, who clings to his chair."
+  },
+  {
+    "t": "character",
+    "x": "RYDER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Humdinger \u2014 did YOU create these robots?"
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "dialogue",
+    "x": "What!? Create the Humbots? I've just been in this lifeguard stand the whole time trying to enjoy the jet ski race!"
+  },
+  {
+    "t": "action",
+    "x": "Three HUMBOTS erupt from the sand at the base of the tower. They grab the support pieces from each 4-foot section \u2014 bottom, middle, top \u2014 and yank them free."
+  },
+  {
+    "t": "action",
+    "x": "The 12-foot lifeguard stand begins to sway. Left. Right. Left. Right. HUMDINGER grips his chair with both hands, crying. The tower rocks like a metronome."
+  },
+  {
+    "t": "character",
+    "x": "RYDER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Rocky! We need you!"
+  },
+  {
+    "t": "game",
+    "x": "\ud83c\udfae  GAME 3 \u2014 ROCKY: FIX THE LIFEGUARD TOWER"
+  },
+  {
+    "t": "action",
+    "x": "ROCKY stands on the beach below the swaying tower. His pup pack deploys \u2014 the retractable claw extends outward, ready. Three pieces lie in the sand nearby, each with a HUMBOT still clinging to it stubbornly."
+  },
+  {
+    "t": "action",
+    "x": "The tower sways continuously. HUMDINGER whimpers at the top. Each 4-foot section has a gap where its support piece belongs."
+  },
+  {
+    "t": "action",
+    "x": "BOTTOM PIECE (0-4 ft): Close range. Easy timing. Claw grabs piece \u2014 Humbot dangles, wriggling. Match shape to the gap in the bottom section. Piece snaps in. Humbot lets go and drops to beach. SPLAT. Stars circle its head."
+  },
+  {
+    "t": "action",
+    "x": "MIDDLE PIECE (4-8 ft): Claw extends further. Humbot grips tighter. Tower sways more. Match shape to middle section gap. Piece snaps in. Second Humbot drops. SPLAT."
+  },
+  {
+    "t": "action",
+    "x": "TOP PIECE (8-12 ft): Full extension. Biggest sway arc. Humbot clinging with all four spring arms. Match shape to top section gap. Piece snaps in. Third Humbot drops from 12 feet. SPLAT. Extra big stars."
+  },
+  {
+    "t": "action",
+    "x": "The tower steadies. HUMDINGER exhales and smooths his jacket with great dignity."
+  },
+  {
+    "t": "character",
+    "x": "ROCKY"
+  },
+  {
+    "t": "dialogue",
+    "x": "There! Good as new. Better, actually \u2014 that middle piece is recycled from a surfboard."
+  },
+  {
+    "t": "game",
+    "x": "END GAME 3"
+  },
+  {
+    "t": "transition",
+    "x": "CUT TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. ADVENTURE BAY BEACH - CONTINUOUS"
+  },
+  {
+    "t": "action",
+    "x": "The lifeguard stand stands perfectly straight. MAYOR GOODWAY arrives, fanning herself."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR GOODWAY"
+  },
+  {
+    "t": "dialogue",
+    "x": "Now THAT was a rescue worth watching!"
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Hmph. Well... I suppose... thank you."
+  },
+  {
+    "t": "action",
+    "x": "A lone HUMBOT pops up from the sand, clocks Humdinger's top hat, and snatches it. HUMDINGER yelps and leaps from the stand, chasing the Humbot down the beach."
+  },
+  {
+    "t": "action",
+    "x": "The pups watch and laugh."
+  },
+  {
+    "t": "character",
+    "x": "RYDER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Great work, team! No job is too big, no pup is too small!"
+  },
+  {
+    "t": "transition",
+    "x": "CUT TO:"
+  },
+  {
+    "t": "scene",
+    "x": "EXT. FOGGY BOTTOM - DOCK - MOMENTS LATER"
+  },
+  {
+    "t": "action",
+    "x": "Rocky's tugboat chugs up to Foggy Bottom's dock. It tips its hold \u2014 a crate of captured HUMBOTS slides out and lands on the pier with a heavy THUNK."
+  },
+  {
+    "t": "action",
+    "x": "HUMDINGER walks up, hat now returned. He sees the crate. He opens it. Every single Humbot springs out at once and scatters through his lair in every direction."
+  },
+  {
+    "t": "action",
+    "x": "HUMDINGER stares. A long beat. Then: a slow, magnificent face-palm."
+  },
+  {
+    "t": "transition",
+    "x": "FADE OUT."
+  },
+  {
+    "t": "noninteractive",
+    "x": "[ MISSION COMPLETE \u2014 Adventure Bay Jet Ski Race ]"
+  }
 ];
 
 const TYPE_META = {
@@ -732,6 +1017,63 @@ const TYPE_META = {
 const TYPE_ORDER = Object.keys(TYPE_META);
 window._focusedSB = null;
 
+// ── Auto-save & GitHub push ────────────────────────────────────────
+const SERVER = window.location.hostname !== 'joelaaroncarlson.github.io'
+  ? `http://${window.location.hostname}:8090`
+  : null;
+
+let _saveTimer = null;
+function getScriptBlocks() {
+  return Array.from(document.querySelectorAll('#script-blocks .sb')).map(b => ({
+    t: b.dataset.type, x: b.textContent
+  }));
+}
+function setSaveStatus(msg, color) {
+  const el = document.getElementById('save-status');
+  if (el) { el.textContent = msg; el.style.color = color || ''; }
+}
+function saveScriptState() {
+  if (!SERVER) return;
+  const blocks = getScriptBlocks();
+  setSaveStatus('● saving…', '#fbbf24');
+  fetch(SERVER + '/save', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(blocks)
+  }).then(r => r.json())
+    .then(() => setSaveStatus('● saved', '#86efac'))
+    .catch(() => setSaveStatus('● save failed', '#f87171'));
+}
+function debounceSave() {
+  clearTimeout(_saveTimer);
+  setSaveStatus('● unsaved', '#fbbf24');
+  _saveTimer = setTimeout(saveScriptState, 1500);
+}
+function pushToGitHub() {
+  if (!SERVER) { alert('Push only works from the hosted version at 192.168.1.89:8090'); return; }
+  const btn = document.getElementById('push-btn');
+  btn.textContent = '⏳ Pushing…'; btn.disabled = true;
+  // Save first, then push
+  fetch(SERVER + '/save', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(getScriptBlocks())
+  }).then(() => fetch(SERVER + '/push', { method: 'POST' }))
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        btn.textContent = '✅ Pushed!';
+        setSaveStatus('● saved + live', '#86efac');
+        setTimeout(() => { btn.textContent = '🚀 Push to GitHub'; btn.disabled = false; }, 3000);
+      } else throw new Error(d.error);
+    }).catch(e => {
+      btn.textContent = '❌ Failed'; btn.disabled = false;
+      setSaveStatus('● push failed', '#f87171');
+      console.error(e);
+      setTimeout(() => btn.textContent = '🚀 Push to GitHub', 3000);
+    });
+}
+
 function renderMissionScript() {
   const el = document.getElementById('tab-script');
   el.innerHTML = `
@@ -742,7 +1084,10 @@ function renderMissionScript() {
       <button class="script-type-btn" onclick="insertSB('above')" title="Insert above">↑ Add</button>
       <button class="script-type-btn" onclick="insertSB('below')" title="Insert below">↓ Add</button>
       <button class="script-type-btn danger" onclick="deleteSB()" title="Delete block">✕ Delete</button>
-      <span class="script-toolbar-label" style="margin-left:.5rem">TAB=cycle type · ENTER=next block · BACKSPACE on empty=delete</span>
+      <div class="script-toolbar-sep"></div>
+      <span id="save-status" class="script-toolbar-label" style="min-width:80px">● saved</span>
+      <button class="script-type-btn" id="push-btn" style="background:#14532d;color:#86efac;border-color:#166534;font-weight:700" onclick="pushToGitHub()">🚀 Push to GitHub</button>
+      <span class="script-toolbar-label" style="margin-left:.5rem;opacity:.5">TAB=cycle · ENTER=next · BKSP on empty=delete</span>
     </div>
     <div class="script-page-bg">
       <div class="script-page">
@@ -756,7 +1101,25 @@ function renderMissionScript() {
       </div>
     </div>`;
   const container = document.getElementById('script-blocks');
-  SCRIPT_DATA.forEach(b => container.appendChild(mkSB(b.t, b.x)));
+
+  // Try to restore saved state from server, fall back to hardcoded SCRIPT_DATA
+  const loadBlocks = (data) => {
+    container.innerHTML = '';
+    data.forEach(b => container.appendChild(mkSB(b.t, b.x)));
+    // Wire auto-save to every block
+    container.addEventListener('input', debounceSave);
+    if (!SERVER) setSaveStatus('● github pages', '#94a3b8');
+  };
+
+  if (SERVER) {
+    setSaveStatus('● loading…', '#fbbf24');
+    fetch(SERVER + '/state')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => loadBlocks(data && data.length ? data : SCRIPT_DATA))
+      .catch(() => loadBlocks(SCRIPT_DATA));
+  } else {
+    loadBlocks(SCRIPT_DATA);
+  }
 }
 
 function mkSB(type, text) {
