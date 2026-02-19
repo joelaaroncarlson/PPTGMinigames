@@ -1135,6 +1135,7 @@ function mkSB(type, text) {
     document.querySelectorAll('.sb').forEach(b => b.classList.remove('focused'));
     d.classList.add('focused');
     updateSBToolbar(d.dataset.type);
+    setTimeout(() => seedParen(d), 0);
   });
   d.addEventListener('input', () => {
     // uppercase enforcement for character/transition/scene
@@ -1158,6 +1159,7 @@ function mkSB(type, text) {
       d.dataset.type = nt;
       d.dataset.placeholder = TYPE_META[nt].label;
       updateSBToolbar(nt);
+      seedParen(d);
     } else if (e.key === 'Backspace' && d.textContent === '') {
       e.preventDefault();
       const prev = d.previousElementSibling || d.nextElementSibling;
@@ -1172,6 +1174,15 @@ function mkSB(type, text) {
 function placeCursorAtEnd(el) {
   try { const r = document.createRange(), s = window.getSelection(); r.selectNodeContents(el); r.collapse(false); s.removeAllRanges(); s.addRange(r); } catch(e){}
 }
+function placeCursorAt(node, offset) {
+  try { const r = document.createRange(), s = window.getSelection(); r.setStart(node, offset); r.collapse(true); s.removeAllRanges(); s.addRange(r); } catch(e){}
+}
+function seedParen(el) {
+  if (el.dataset.type === 'parenthetical' && !el.textContent.trim()) {
+    el.textContent = '()';
+    if (el.firstChild) placeCursorAt(el.firstChild, 1);
+  }
+}
 function updateSBToolbar(active) {
   document.querySelectorAll('.script-type-btn[data-stype]').forEach(b => b.classList.toggle('active', b.dataset.stype === active));
 }
@@ -1181,6 +1192,7 @@ function setSBType(type) {
   window._focusedSB.dataset.placeholder = TYPE_META[type].label;
   window._focusedSB.classList.remove('sb-end');
   updateSBToolbar(type);
+  seedParen(window._focusedSB);
   window._focusedSB.focus();
 }
 function insertSB(dir) {
