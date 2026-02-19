@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAW Patrol: The Game — Minigame Ideas</title>
+<style>
+  :root {
+    --chase: #3B82F6; --marshall: #EF4444; --skye: #EC4899;
+    --rocky: #22C55E; --rubble: #F59E0B; --zuma: #EAB308;
+    --everest: #06B6D4; --tracker: #92400E;
+    --bg: #0F172A; --card: #1E293B; --card-hover: #334155;
+    --text: #F1F5F9; --muted: #94A3B8; --border: #475569;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+
+  header { text-align: center; padding: 2rem 1rem; background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-bottom: 2px solid var(--border); }
+  header h1 { font-size: 2rem; margin-bottom: .25rem; }
+  header h1 span { background: linear-gradient(90deg, var(--chase), var(--marshall), var(--skye), var(--rocky), var(--rubble), var(--everest)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  header p { color: var(--muted); font-size: 1.05rem; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem 0; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 10; border-bottom: 1px solid var(--border); }
+  .pup-btn { padding: .4rem .8rem; border-radius: 999px; border: 2px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: .85rem; font-weight: 600; transition: all .15s; }
+  .pup-btn:hover { opacity: .85; }
+  .pup-btn.active { color: #fff; }
+  .pup-btn[data-pup="all"].active { background: var(--border); }
+  .pup-btn[data-pup="chase"].active { background: var(--chase); border-color: var(--chase); }
+  .pup-btn[data-pup="marshall"].active { background: var(--marshall); border-color: var(--marshall); }
+  .pup-btn[data-pup="skye"].active { background: var(--skye); border-color: var(--skye); }
+  .pup-btn[data-pup="rocky"].active { background: var(--rocky); border-color: var(--rocky); }
+  .pup-btn[data-pup="rubble"].active { background: var(--rubble); border-color: var(--rubble); }
+  .pup-btn[data-pup="zuma"].active { background: var(--zuma); border-color: var(--zuma); }
+  .pup-btn[data-pup="everest"].active { background: var(--everest); border-color: var(--everest); }
+  .pup-btn[data-pup="tracker"].active { background: var(--tracker); border-color: var(--tracker); }
+
+  .star-filter, .sort-select { padding: .4rem .6rem; border-radius: .5rem; border: 2px solid var(--border); background: var(--card); color: var(--text); font-size: .85rem; cursor: pointer; }
+  .search-input { padding: .4rem .8rem; border-radius: .5rem; border: 2px solid var(--border); background: var(--card); color: var(--text); font-size: .85rem; flex: 1; min-width: 140px; }
+  .search-input::placeholder { color: var(--muted); }
+  .count { margin-left: auto; color: var(--muted); font-size: .85rem; white-space: nowrap; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; padding: 1rem 0; }
+  .card { background: var(--card); border-radius: .75rem; padding: 1.25rem; border-left: 4px solid var(--border); transition: background .15s, transform .15s; }
+  .card:hover { background: var(--card-hover); transform: translateY(-2px); }
+  .card[data-pup="chase"] { border-left-color: var(--chase); }
+  .card[data-pup="marshall"] { border-left-color: var(--marshall); }
+  .card[data-pup="skye"] { border-left-color: var(--skye); }
+  .card[data-pup="rocky"] { border-left-color: var(--rocky); }
+  .card[data-pup="rubble"] { border-left-color: var(--rubble); }
+  .card[data-pup="zuma"] { border-left-color: var(--zuma); }
+  .card[data-pup="everest"] { border-left-color: var(--everest); }
+  .card[data-pup="tracker"] { border-left-color: var(--tracker); }
+
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .5rem; }
+  .card-title { font-size: 1.1rem; font-weight: 700; }
+  .card-stars { color: #FBBF24; white-space: nowrap; font-size: 1rem; }
+  .card-pup { display: inline-block; font-size: .75rem; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; margin-bottom: .5rem; color: #fff; }
+  .card-pup.chase { background: var(--chase); }
+  .card-pup.marshall { background: var(--marshall); }
+  .card-pup.skye { background: var(--skye); }
+  .card-pup.rocky { background: var(--rocky); }
+  .card-pup.rubble { background: var(--rubble); }
+  .card-pup.zuma { background: var(--zuma); }
+  .card-pup.everest { background: var(--everest); }
+  .card-pup.tracker { background: var(--tracker); }
+
+  .card-pitch { color: var(--muted); font-size: .9rem; margin-bottom: .75rem; }
+  .card-details { font-size: .8rem; color: var(--muted); }
+  .card-details summary { cursor: pointer; color: var(--text); font-weight: 600; font-size: .85rem; }
+  .card-details summary:hover { opacity: .8; }
+  .detail-section { margin-top: .5rem; }
+  .detail-section strong { color: var(--text); }
+  .detail-section a { color: #60A5FA; text-decoration: none; }
+  .detail-section a:hover { text-decoration: underline; }
+
+  .card-mechanic { display: inline-block; font-size: .7rem; padding: .1rem .4rem; border-radius: .25rem; background: rgba(255,255,255,.08); color: var(--muted); margin-right: .25rem; margin-bottom: .25rem; }
+  .card-setting { font-size: .8rem; color: var(--muted); margin-bottom: .25rem; }
+
+  .missions { padding: 1rem 0 2rem; }
+  .missions h2 { font-size: 1.4rem; margin-bottom: 1rem; }
+  .mission-card { background: var(--card); border-radius: .75rem; padding: 1rem 1.25rem; margin-bottom: .75rem; }
+  .mission-card h3 { font-size: 1rem; margin-bottom: .5rem; }
+  .mission-step { display: flex; align-items: center; gap: .5rem; padding: .25rem 0; font-size: .9rem; }
+  .mission-num { width: 1.5rem; height: 1.5rem; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+
+  .design-section { background: var(--card); border-radius: .75rem; padding: 1.5rem; margin-bottom: 2rem; }
+  .design-section h2 { font-size: 1.3rem; margin-bottom: .75rem; }
+  .design-section h3 { font-size: 1rem; margin-top: .75rem; margin-bottom: .35rem; color: #60A5FA; }
+  .design-section ul { padding-left: 1.25rem; }
+  .design-section li { margin-bottom: .25rem; font-size: .9rem; color: var(--muted); }
+
+  .tab-bar { display: flex; gap: .25rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border); }
+  .tab-btn { padding: .5rem 1rem; background: none; border: none; color: var(--muted); cursor: pointer; font-size: .95rem; font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+  .tab-btn.active { color: var(--text); border-bottom-color: #60A5FA; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .humbot-header { text-align: center; padding: 1.5rem 0; }
+  .humbot-header h2 { font-size: 1.5rem; margin-bottom: .25rem; }
+  .humbot-header p { color: var(--muted); }
+  .humbot-structure { background: var(--card); border-radius: .75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .humbot-structure h3 { font-size: 1rem; margin-bottom: .5rem; color: #A78BFA; }
+  .humbot-structure ul { padding-left: 1.25rem; color: var(--muted); font-size: .9rem; }
+  .humbot-structure li { margin-bottom: .2rem; }
+
+  .humbot-option { background: var(--card); border-radius: .75rem; padding: 1.5rem; margin-bottom: 1.25rem; border-left: 4px solid #A78BFA; }
+  .humbot-option.selected { border-left-color: #FBBF24; background: #1a2236; }
+  .humbot-option-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .25rem; }
+  .humbot-option h3 { font-size: 1.2rem; margin-bottom: .1rem; }
+  .humbot-option .option-tag { font-size: .7rem; padding: .15rem .5rem; border-radius: 999px; background: #A78BFA; color: #fff; font-weight: 600; }
+  .humbot-option .option-tone { color: var(--muted); font-size: .85rem; margin-bottom: .75rem; font-style: italic; }
+  .humbot-game { background: rgba(255,255,255,.03); border-radius: .5rem; padding: 1rem; margin-bottom: .75rem; border: 1px solid rgba(255,255,255,.06); }
+  .humbot-game-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .35rem; }
+  .humbot-game h4 { font-size: 1rem; margin: 0; }
+  .humbot-game .game-new { font-size: .65rem; padding: .1rem .4rem; border-radius: .25rem; background: #22C55E; color: #fff; font-weight: 600; }
+  .humbot-game .game-evolved { font-size: .65rem; padding: .1rem .4rem; border-radius: .25rem; background: #3B82F6; color: #fff; font-weight: 600; }
+  .humbot-game .game-mechanic { font-size: .8rem; color: #A78BFA; margin-bottom: .35rem; }
+  .humbot-game .game-flow { font-size: .88rem; color: var(--muted); margin-bottom: .35rem; }
+  .humbot-game .game-stages { font-size: .8rem; color: var(--muted); margin-bottom: .35rem; padding-left: 1rem; }
+  .humbot-game .humbot-moment { font-size: .82rem; color: #FBBF24; background: rgba(251,191,36,.08); padding: .4rem .6rem; border-radius: .35rem; margin-top: .35rem; }
+  .humbot-bridge { text-align: center; color: #60A5FA; font-size: .85rem; padding: .5rem 0; font-style: italic; }
+
+  .humbot-compare { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .8rem; }
+  .humbot-compare th { background: rgba(255,255,255,.05); padding: .5rem; text-align: left; color: var(--text); border-bottom: 2px solid var(--border); }
+  .humbot-compare td { padding: .4rem .5rem; border-bottom: 1px solid rgba(255,255,255,.05); color: var(--muted); vertical-align: top; }
+  .humbot-compare tr:hover td { background: rgba(255,255,255,.02); }
+
+  .humbot-celebration { background: rgba(167,139,250,.1); border-radius: .5rem; padding: 1rem; margin-top: .5rem; font-size: .88rem; color: var(--muted); border: 1px solid rgba(167,139,250,.2); }
+
+  /* ── Script Editor ── */
+  .script-toolbar { position: sticky; top: 40px; z-index: 9; background: #1a1a2e; padding: .5rem .75rem; display: flex; gap: .3rem; flex-wrap: wrap; align-items: center; border-bottom: 2px solid #333; }
+  .script-type-btn { padding: .25rem .55rem; border-radius: .3rem; border: 1px solid #444; background: #2d2d2d; color: #bbb; cursor: pointer; font-size: .72rem; font-family: 'Courier New', monospace; font-weight: 600; transition: all .1s; white-space: nowrap; }
+  .script-type-btn:hover { background: #3d3d3d; color: #fff; }
+  .script-type-btn.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+  .script-type-btn.danger:hover { background: #7f1d1d; color: #fca5a5; border-color: #7f1d1d; }
+  .script-toolbar-sep { width: 1px; height: 20px; background: #444; margin: 0 .2rem; }
+  .script-toolbar-label { color: #666; font-size: .7rem; font-family: 'Courier New', monospace; white-space: nowrap; }
+  .script-page-bg { background: #6b7280; padding: 2rem 1rem 3rem; min-height: 600px; }
+  .script-page { background: #fff; color: #111; width: 740px; max-width: 100%; margin: 0 auto; padding: 72px 72px 96px 108px; font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.65; min-height: 900px; box-shadow: 0 6px 32px rgba(0,0,0,.6); position: relative; }
+  .script-title-block { text-align: center; margin-bottom: 2.5em; padding-bottom: 1.5em; border-bottom: 1px solid #ccc; font-family: 'Courier New', monospace; }
+  .script-title-block h2 { font-size: 1em; font-family: inherit; margin: 0 0 .3rem; letter-spacing: 1px; }
+  .script-title-block p { font-size: .85em; color: #555; margin: .1rem 0; }
+  .sb { display: block; margin: 0; padding: 1px 2px; outline: none; min-height: 1.65em; white-space: pre-wrap; word-wrap: break-word; cursor: text; border-radius: 2px; }
+  .sb.focused { background: #fef9c3; }
+  .sb[data-type="scene"] { text-transform: uppercase; font-weight: bold; text-decoration: underline; margin-top: 1.5em; }
+  .sb[data-type="scene"].focused { background: #dbeafe; }
+  .sb[data-type="action"] { margin: .2em 0; }
+  .sb[data-type="character"] { margin-top: 1em; margin-left: 195px; text-transform: uppercase; }
+  .sb[data-type="dialogue"] { margin-left: 110px; margin-right: 96px; }
+  .sb[data-type="parenthetical"] { margin-left: 145px; margin-right: 120px; font-style: italic; }
+  .sb[data-type="transition"] { text-align: right; text-transform: uppercase; margin: .75em 0 .25em; }
+  .sb[data-type="noninteractive"] { text-align: center; border-top: 2px solid #333; border-bottom: 2px solid #333; padding: 5px 0; margin: 1.25em 0; font-weight: bold; background: #f3f4f6; letter-spacing: 1px; color: #1f2937; }
+  .sb[data-type="noninteractive"].focused { background: #e5e7eb; }
+  .sb[data-type="game"] { margin: .75em 0; padding: 4px 8px; border-left: 4px solid #7c3aed; background: #f5f3ff; font-weight: bold; color: #4c1d95; }
+  .sb[data-type="game"].focused { background: #ede9fe; }
+  .sb[data-type="game"].sb-end { border-left-color: #d1d5db; background: #f9fafb; color: #6b7280; }
+  .sb-placeholder:empty:before { content: attr(data-placeholder); color: #bbb; pointer-events: none; font-style: italic; }
+  .script-hint { text-align: center; margin-top: 1rem; font-size: .78rem; color: #9ca3af; font-family: 'Courier New'; }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.4rem; }
+    .controls { gap: .35rem; }
+    .sb[data-type="character"] { margin-left: 80px; }
+    .sb[data-type="dialogue"] { margin-left: 40px; margin-right: 20px; }
+    .sb[data-type="parenthetical"] { margin-left: 55px; margin-right: 30px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🐾 <span>PAW Patrol: The Game</span></h1>
+  <p>70 Minigame Ideas · 10 per Pup · Ages 3–5 · Mobile Touch</p>
+</header>
+<div class="container">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="games">🎮 Games</button>
+    <button class="tab-btn" data-tab="missions">🎯 Missions</button>
+    <button class="tab-btn" data-tab="humbots">🤖 Humbot Missions</button>
+    <button class="tab-btn" data-tab="script">🎬 Mission Script</button>
+    <button class="tab-btn" data-tab="design">📐 Design Principles</button>
+  </div>
+
+  <div class="tab-content active" id="tab-games">
+    <div class="controls">
+      <button class="pup-btn active" data-pup="all">All</button>
+      <button class="pup-btn" data-pup="chase">🔵 Chase</button>
+      <button class="pup-btn" data-pup="marshall">🔴 Marshall</button>
+      <button class="pup-btn" data-pup="skye">💗 Skye</button>
+      <button class="pup-btn" data-pup="rocky">🟢 Rocky</button>
+      <button class="pup-btn" data-pup="rubble">🟠 Rubble</button>
+      <button class="pup-btn" data-pup="zuma">🟡 Zuma</button>
+      <button class="pup-btn" data-pup="everest">❄️ Everest</button>
+      <button class="pup-btn" data-pup="tracker">🟤 Tracker</button>
+      <select class="star-filter">
+        <option value="0">All Ratings</option>
+        <option value="5">⭐⭐⭐⭐⭐ only</option>
+        <option value="4">⭐⭐⭐⭐+</option>
+        <option value="3">⭐⭐⭐+</option>
+      </select>
+      <select class="sort-select">
+        <option value="rating">Sort: Rating ↓</option>
+        <option value="name">Sort: Name A–Z</option>
+        <option value="pup">Sort: By Pup</option>
+      </select>
+      <input class="search-input" type="text" placeholder="Search games...">
+      <span class="count"></span>
+    </div>
+    <div class="grid" id="game-grid"></div>
+  </div>
+
+  <div class="tab-content" id="tab-missions"></div>
+  <div class="tab-content" id="tab-humbots"></div>
+  <div class="tab-content" id="tab-script"></div>
+  <div class="tab-content" id="tab-design"></div>
+</div>
+
+<script>
+const games = [
+  // CHASE
+  {pup:"chase",name:"Traffic Crossing",stars:5,pitch:"Chickaletta and her baby chicks need to cross a busy Adventure Bay road! Tap Chase's megaphone to stop traffic, then swipe the chickens across before the next car arrives.",mechanic:"Timing + environmental reading",setting:"Adventure Bay road",episode:"S12 \"Pups Help The Chickens Cross The Road\"",scriptRef:"589694, 762119",similar:"Crossy Road, Frogger in Toy Town",why:"Traffic directing IS Chase. Timing + environmental reading matches top performers. Chickens = comedy gold."},
+  {pup:"chase",name:"Cone Corraller",stars:3,pitch:"Humdinger's kittens knocked over Mr. Porter's fruit crates — drag Chase's orange cones to create a path that guides rolling fruit back into crates.",mechanic:"Drag-and-place (spatial puzzle)",setting:"Adventure Bay town square",episode:"Chase cone deployment S10–12",scriptRef:"562708, 590375",similar:"Marble It Up, Busy Shapes",why:"Spatial puzzles are strong but drag-and-place demands finer motor skills than ideal for 3-year-olds. Cones are on-brand but not Chase's most exciting prop."},
+  {pup:"chase",name:"Net Catcher",stars:5,pitch:"Strong winds at Farmer Yumi's farm blowing harvest baskets across the sky! Chase drives his cruiser below — tap to launch his net at the right moment.",mechanic:"Timing tap (aim + fire)",setting:"Farmer Yumi's Farm",episode:"S10 \"Pups Save A Flying Farmer Yumi\"",scriptRef:"568146, 575269",similar:"Duck Duck Moose, Sago Mini",why:"Net launcher is Chase's most exciting tool. Timing-tap is the highest-engagement mechanic for this age. Directly from S10."},
+  {pup:"chase",name:"Lost Puppy Tracker",stars:4,pitch:"A baby caribou has wandered off — follow glowing paw prints from town through the park to the forest. Prints fade faster each round. Reunite baby with mama!",mechanic:"Scanning + tapping (hidden trail)",setting:"Adventure Bay — town to forest",episode:"S10 \"Pups Save a Baby Caribou\"",scriptRef:"586363",similar:"Highlights Hidden Pictures, PBS Kids Games",why:"Strong emotional payoff and on-brand tracking. Fading prints might frustrate younger 3-year-olds if not generous."},
+  {pup:"chase",name:"Spy Drone Search",stars:5,pitch:"Humdinger hid silly prank items all over town! Chase launches his spy drone — tap on hidden objects (rubber duckies, whoopee cushions) as the camera pans across Adventure Bay.",mechanic:"Scan + identify (tap the right thing)",setting:"Adventure Bay overhead",episode:"Chase spy drone S10–12",scriptRef:"560057, 560183",similar:"Highlights Hidden Pictures, Little Kitten & Friends",why:"Your data PROVES this mechanic works (Skye Goggles = #2 at S-tier). Spy drone is Chase's cool factor. Silly items drive replay."},
+  {pup:"chase",name:"Siren Scatter",stars:3,pitch:"Road blocked by boulders and hay bales! Tilt to steer Chase's cruiser around obstacles, tap the siren to scatter animals safely off the road.",mechanic:"Tilt/swipe steering + siren taps",setting:"Adventure Bay road",episode:"S10 \"Pups Stop the Giant Cuckoo\"",scriptRef:"622684, 625024",similar:"Sago Mini Road Trip, Dr. Panda's Cars",why:"Tilt steering works but simultaneous tilt + tap may overwhelm some 3-year-olds. Better for 4-5."},
+  {pup:"chase",name:"Badge Finder",stars:4,pitch:"Wind blew the pups' badges off the Lookout! Each round shows a silhouette of which badge is missing — find it partially hidden across Adventure Bay.",mechanic:"Hidden object with clues",setting:"Around the Lookout / Adventure Bay",episode:"S10 \"Pups Save Their Digi Tal Friends\"",scriptRef:"301328",similar:"Highlights Hidden Pictures, Nick Jr. app",why:"Collectible seek-and-find with meaningful brand items. Similar to Spy Drone Search — if both ship, one may cannibalize."},
+  {pup:"chase",name:"Rescue Rope Toss",stars:3,pitch:"Alex and Danny stuck on rocks near the water! Swipe to toss Chase's rescue rope — a dotted arc guide shows trajectory. Targets get farther each round.",mechanic:"Aim + swipe-to-throw",setting:"Adventure Bay cliffside / beach",episode:"S10 \"Pups Save the Wacky Water Skiers\"",scriptRef:"590662, 627033",similar:"Angry Birds (simplified), Toca Kitchen",why:"Trajectory-based aiming is harder for 3-year-olds. Rope isn't Chase's most iconic tool. Better for 4+."},
+  {pup:"chase",name:"Megaphone Herder",stars:5,pitch:"Farmer Yumi's animals scattered across the farm! Tap directional arrows on Chase's megaphone to call animals toward their pen. Chickens are fast, goats are stubborn, Garby weaves around.",mechanic:"Directional taps",setting:"Farmer Yumi's Farm",episode:"S10 farm episodes",scriptRef:"590375, 575269",similar:"Toca Life: Farm, Sago Mini Farm",why:"Simplest mechanic possible. Megaphone is Chase's #1 tool (711 mentions). Animal comedy sells itself. Farm setting."},
+  {pup:"chase",name:"Runaway Cart Blocker",stars:4,pitch:"Mr. Porter's cart rolling downhill, bouncing pies and cakes! Chase races alongside — tap to deploy cones and nets to catch items before they splat.",mechanic:"Timing tap to place barriers",setting:"Adventure Bay hill road",episode:"S12 \"Pups Save Adventure Bakes\"",scriptRef:"563708, 590123",similar:"Fruit Ninja (simplified), Toca Kitchen",why:"Strong timing mechanic. Food splatting = funny. Uses both cones and net. Speed increase may frustrate younger players."},
+
+  // MARSHALL
+  {pup:"marshall",name:"Fire Hose Hero",stars:5,pitch:"Small cartoon fires around town! Drag Marshall's water cannon nozzle to aim at each fire — watch it shrink with satisfying sizzle and steam. Three locations across town, farm, and garage.",mechanic:"Aim + spray (drag to direct)",setting:"Adventure Bay buildings / farm",episode:"S11 \"Fire Rescue: Pups Make The News\"",scriptRef:"550362, 557997",similar:"Firefighters by BabyBus, Dr. Panda Firefighters",why:"#1 most obvious missing game. BabyBus proved fire-hosing is top-performing. Marshall IS the fire pup. Replaces weakest performer (Thirsty Animals)."},
+  {pup:"marshall",name:"Ladder Rescue",stars:5,pitch:"Kittens, birds, and Chickaletta stuck up high! Swipe up to extend Marshall's ladder, drag to angle it. When it reaches the animal, Marshall climbs up to rescue.",mechanic:"Extend + position (swipe + drag)",setting:"Adventure Bay trees/buildings",episode:"S12 \"Pups Save a Flying Florist\"",scriptRef:"644524, 709066",similar:"Firefighters by BabyBus, LEGO DUPLO World",why:"Ladder is Marshall's most visual tool. Two-step mechanic gives genuine problem-solving. Rescuing cute animals is THE classic fire truck fantasy."},
+  {pup:"marshall",name:"X-Ray Checkup",stars:5,pitch:"Farm animals have boo-boos! Drag Marshall's X-ray scanner over each animal — hurt spot glows. Tap to apply bandage. Garby's X-ray reveals swallowed berries!",mechanic:"Scan + identify (drag X-ray screen)",setting:"Farmer Yumi's Farm",episode:"S12 \"Fire Rescue: Pups Save a Baby Goat Birthday\"",scriptRef:"585801, 585876",similar:"Pepi Doctor, Toca Doctor",why:"Medical play is one of THE highest-engagement categories for preschoolers. X-ray is unique. Drag-to-scan = environmental reading. Farm setting."},
+  {pup:"marshall",name:"Water Slide Maker",stars:4,pitch:"Hot day! Marshall uses his water cannon to create a water slide — trace a path with your finger and water follows it, then a pup slides down with a big splash!",mechanic:"Trace path (finger drawing)",setting:"Adventure Bay Beach to town",episode:"S10 \"Pups Save The Wacky Water Skiers\"",scriptRef:"555955",similar:"Where's My Water?, Sago Mini Ocean Swimmer",why:"Path-drawing is loved by 3-year-olds. Water following your finger is magical. Pup sliding is great payoff. Slightly off-brand — Marshall puts out fires, not building waterparks."},
+  {pup:"marshall",name:"Bucket Brigade",stars:3,pitch:"Fire at Rocky's Garage! Pups pass water buckets in a chain — tap in rhythm to keep buckets moving. Fill the meter to put out the fire!",mechanic:"Rhythm tapping (pass buckets)",setting:"Rocky's Garage",episode:"S12 \"Pups Save Adventure Bakes\"",scriptRef:"671076, 575269",similar:"Pup Pup Boogie (canon), Baby Shark Run Away",why:"Rhythm tapping is proven. Teamwork is great. But bucket-passing may be abstract for 3-year-olds. Fire Hose Hero is more direct."},
+  {pup:"marshall",name:"Campfire Builder",stars:4,pitch:"Campfire night at the farm! Drag stones into a ring, place logs, Marshall lights it safely. Bonus: marshmallow-roasting timing game!",mechanic:"Drag to arrange + tap to light",setting:"Farmer Yumi's Farm — evening",episode:"S10 \"Pups Save a Baby Caribou\"",scriptRef:"559545, 600093",similar:"Toca Life: Farm, Toca Life: Vacation",why:"Multi-stage with different mechanics. Fire SAFETY angle is educational. Marshmallow roasting is irresistible."},
+  {pup:"marshall",name:"Hydrant Fixer",stars:3,pitch:"Hydrant burst! Water spraying everywhere — tap bolts to tighten, swipe to redirect spray, seal it shut.",mechanic:"Tap to tighten + aim to redirect",setting:"Adventure Bay street",episode:"General infrastructure rescues",scriptRef:"N/A",similar:"Toca Builders, Fiete Cars",why:"Step-by-step fixing is solid but 'hydrant repair' is abstract for 3-year-olds. More of a Rocky game. No direct script reference."},
+  {pup:"marshall",name:"Pup Wash Station",stars:5,pitch:"After a muddy rescue, each pup reacts differently to being washed! Swipe to scrub mud, tap shampoo, swipe hose to rinse. Rubble loves it, Chase wiggles, Rocky tries to escape!",mechanic:"Swipe to scrub + tap to rinse",setting:"Adventure Bay — Katie's / beach",episode:"Rocky's bath aversion (S1E1 through S12)",scriptRef:"617396",similar:"Toca Hair Salon, LEGO DUPLO World bath",why:"Your OWN DATA proves car wash works (3rd best). This evolves it with character personality. Rocky's water-aversion is the longest-running gag. Grooming = proven top category."},
+  {pup:"marshall",name:"Smoke Signal Spotter",stars:4,pitch:"Marshall on fire watch from the Lookout! Smoke wisps appear across Adventure Bay — tap the PROBLEM smoke (behind City Hall) not the safe smoke (chimney, BBQ).",mechanic:"Scan + tap (discriminate)",setting:"Adventure Bay skyline from Lookout",episode:"S11 \"Fire Rescue: Pups Make The News\"",scriptRef:"671076, 550078",similar:"Highlights Hidden Pictures, Skye Goggles concept",why:"Environmental scanning + discrimination is cognitively rich. Safe-vs-danger distinction may be too abstract for some 3-year-olds. Better for 4+."},
+  {pup:"marshall",name:"Emergency Slide",stars:5,pitch:"Marshall races down the Lookout's spiral slide — THE most iconic gag in 300+ episodes! Tilt to steer, collect pup treats, dodge bouncing balls with classic Marshall comedy.",mechanic:"Tilt to steer + tap to collect",setting:"The Lookout",episode:"Every episode's deployment sequence",scriptRef:"552443, 559968",similar:"Subway Surfers (simplified), LEGO DUPLO Train",why:"Marshall crashing is THE signature gag across ALL episodes. Every kid anticipates this moment. Tilt-to-steer proven for this age. The Lookout slide is iconic."},
+
+  // SKYE
+  {pup:"skye",name:"Sky Scanner",stars:5,pitch:"Storm blew things across Adventure Bay! Skye flies overhead — pan the view and tap displaced items: a hat on a roof, kite in a tree, cat on a flagpole.",mechanic:"Pan + tap (scan from above)",setting:"Adventure Bay overhead",episode:"S10 \"Pups Save a Wind-Swept Polar Bear Cub\"",scriptRef:"550078, 551553",similar:"Highlights Hidden Pictures, Skye Goggles (your #2)",why:"Already proved this exact mechanic — Skye Goggles is #2 at S-tier. Extends with scrolling multi-area format. Three areas = 3x replay."},
+  {pup:"skye",name:"Harness Airlift",stars:5,pitch:"Animals stranded! Skye lowers her harness — swipe to position above target, tap to grab, fly to safe zone, tap to set down gently.",mechanic:"Swipe to fly + tap to grab/release",setting:"Various Adventure Bay locations",episode:"S12 \"Pups Save a Swept-Away Sweetheart\"",scriptRef:"550280, 759673",similar:"Sago Mini Planes, Humbot Grabber (your #1)",why:"Your #1 performer IS a crane/grab game. This is the character-driven evolution. Two-phase rescue creates complete narrative arc."},
+  {pup:"skye",name:"Wind Tunnel Flyer",stars:4,pitch:"Skye flies through strong winds to reach the farm! Tilt to steer through swirling leaf streams, collect pup treats in calm patches.",mechanic:"Tilt to steer through wind",setting:"Lookout to Farmer Yumi's Farm",episode:"S10 \"Pups Save A Flying Farmer Yumi\"",scriptRef:"550251, 575269",similar:"Sago Mini Planes, Alto's Odyssey (simplified)",why:"Tilt-to-fly is natural. Wind gusts create environmental reading. Continuous tilt may tire small hands — better for 4+."},
+  {pup:"skye",name:"Flower Drop",stars:4,pitch:"Florist's flowers blew away! Skye collected them — flying over town, tap to release flowers at the right moment so they land in gardens and flower pots below.",mechanic:"Timing tap (drop on targets)",setting:"Adventure Bay — overhead",episode:"S12 \"Pups Save a Flying Florist\"",scriptRef:"646691, 771839",similar:"Doodle Jump inverted, bomber-style simplified",why:"Timing-tap with moving targets is satisfying. Directly from S12. Flowers in pots = beautiful feedback. Kids prefer catching over releasing — slight weakness."},
+  {pup:"skye",name:"Cloud Painter",stars:4,pitch:"Skye soars through clouds shaped like PAW Patrol badges! Trace the outline — sparkly trail bursts into confetti. After 3 shapes, a rainbow appears!",mechanic:"Trace shapes in clouds",setting:"Sky above Adventure Bay",episode:"S10 \"Pups Save the Rainbow\"",scriptRef:"562184",similar:"123Draw, Khan Academy Kids",why:"Tracing is natural for toddlers. Sparkle effects magical. Rainbow payoff wonderful. More calm/creative than rescue — good palate cleanser."},
+  {pup:"skye",name:"Goggles Night Vision",stars:5,pitch:"Baby animals need to get home before dark! Skye's night-vision goggles create a spotlight following your finger — sweep to find glowing eyes hidden in the park, forest, and farm.",mechanic:"Pan + tap (spotlight search)",setting:"Adventure Bay — twilight",episode:"S11 \"Pups Save The Big Nightlight\"",scriptRef:"607717, 676018",similar:"Peekaboo Barn (top toddler app ever), Little Kitten",why:"Flashlight/spotlight is PROVEN top-tier — extended peek-a-boo, developmentally perfect for 2-4. Peekaboo Barn has millions of downloads. Night-vision = Skye's gear."},
+  {pup:"skye",name:"Kite Rescue",stars:3,pitch:"Kids' kites tangled and stuck! Skye flies between strings to reach them — swipe to navigate gaps, tap to grab, fly back down to deliver.",mechanic:"Swipe to steer + timing tap",setting:"Adventure Bay Beach / hilltop",episode:"Wind themes S10–12",scriptRef:"N/A",similar:"Flappy Bird simplified, Sago Mini Planes",why:"Navigation between strings is appealing but obstacle-avoidance is hardest mechanic for 3-year-olds. No direct script reference."},
+  {pup:"skye",name:"Aerial Photograph",stars:4,pitch:"Francois needs aerial farm photos! Drag camera frame over targets — glows green when aligned. Tap to snap! Moving animals need timing.",mechanic:"Frame + snap (positioning)",setting:"Overhead — Farmer Yumi's Farm",episode:"Francois photography scenes S10",scriptRef:"599534, 619654",similar:"Pokémon Snap (toddler version), Sago Mini Road Trip",why:"Photography-as-gameplay is novel. Moving animals add timing. Francois is beloved (3,385 mentions). Framing may be abstract for some 3-year-olds."},
+  {pup:"skye",name:"Loop-de-Loop",stars:4,pitch:"Skye shows off flight tricks! Trace dotted loop patterns — Skye follows with a sparkle trail. Crowd cheers below!",mechanic:"Trace flight path (draw loops)",setting:"Sky above Adventure Bay",episode:"Skye helicopter tricks",scriptRef:"573968, 574046",similar:"123Draw, Khan Academy Kids",why:"Path-tracing with real-time character following is magical. Sparkle trail satisfying. Similar vibe to Cloud Painter — pick one."},
+  {pup:"skye",name:"Windsock Weather Check",stars:3,pitch:"Skye checks windsocks — tap the matching direction arrow from 4 options. Correct answers clear the fog!",mechanic:"Match + tap (pattern matching)",setting:"Adventure Bay — various",episode:"S10 \"Pups Stop the Foggy Skies\"",scriptRef:"580278, 580300",similar:"Moose Math, educational matching games",why:"Educational but essentially a quiz. Not enough action for rescue game context. Good education, weaker entertainment."},
+
+  // ROCKY
+  {pup:"rocky",name:"Fix the Fence",stars:5,pitch:"Wind knocked down Farmer Yumi's fences! Match each repair piece to the right gap. Rocky screws it in with a *vrrrr!* Final stage uses a recycled surfboard as a plank!",mechanic:"Match parts + tap to attach",setting:"Farmer Yumi's Farm",episode:"S11 fence fix + farm S10",scriptRef:"630144, 630281",similar:"Busy Shapes (award-winning), LEGO DUPLO World",why:"Shape matching is THE proven top preschool mechanic. Surfboard-as-plank is peak Rocky. Farm setting. Satisfying feedback."},
+  {pup:"rocky",name:"Sort & Recycle",stars:5,pitch:"Festival aftermath — stuff everywhere! Drag items from a conveyor to color-coded bins. Gets funnier as items get weirder — including what looks like Chickaletta (she walks away!).",mechanic:"Drag to sort (bins)",setting:"Rocky's Garage / Adventure Bay",episode:"Rocky's eco identity throughout",scriptRef:"2369, 562285",similar:"Busy Shapes, BabyBus sorting games",why:"Sorting is a core preschool skill AND top-performing category. Conveyor belt creates pacing. Comedy items drive replay. Rocky's Garage has proven audience."},
+  {pup:"rocky",name:"Bridge Builder",stars:4,pitch:"Footbridge broken! Drag recycled planks of different lengths to the right slots. When complete, Farmer Al walks across with his veggie cart.",mechanic:"Drag planks to build (slot into place)",setting:"Adventure Bay — over a stream",episode:"S10 \"Pups Save the History of Adventure Bay\"",scriptRef:"559090, 559095",similar:"LEGO DUPLO World, Pango Build Park",why:"Construction with tangible result. Size-matching adds cognitive depth. Slower-paced — better as mid-mission calming game."},
+  {pup:"rocky",name:"Grabber Claw Cleanup",stars:5,pitch:"Beach messy after a storm! Position Rocky's grabber claw over debris, tap to grab. Some items need TWO taps. Environmental cleanup message!",mechanic:"Position + tap (crane game)",setting:"Adventure Bay Beach",episode:"S11 \"Pups Save the Sea Sponges!\"",scriptRef:"552779, 553170",similar:"Your own Humbot Grabber (#1 at S-tier)",why:"Your data screams this: Humbot Grabber is #1 at S-tier. This IS that mechanic with Rocky's tool + cleanup message. You know it works."},
+  {pup:"rocky",name:"Pipe Connector",stars:4,pitch:"Irrigation broken! Tap pipe segments to rotate them until they connect from source to farm field. Water flows through and plants spring up!",mechanic:"Rotate + connect (pipe puzzle)",setting:"Rocky's Garage / underground",episode:"S10 infrastructure rescues",scriptRef:"565711, 589945",similar:"Pipe Puzzle, Water Connect Puzzle",why:"Rotation puzzles proven and satisfying. Water flowing = magical feedback. Rotation requires spatial transformation still developing at age 3 — better for 4+."},
+  {pup:"rocky",name:"Tool Matcher",stars:4,pitch:"Rocky's toolbox fell! Find tools hidden around the garage and drag each to its matching silhouette. Rocky says the tool name when placed correctly.",mechanic:"Match + drag (tool to silhouette)",setting:"Rocky's Garage",episode:"Rocky's garage scenes S10–12",scriptRef:"552511, 558811",similar:"Busy Shapes, Melissa & Doug Shape Sorting",why:"Shape matching + hidden object combo. Educational. Better as calm mid-mission game."},
+  {pup:"rocky",name:"Invention Builder",stars:4,pitch:"Ryder needs a gadget! Rocky finds recycled parts — tap highlighted spots to snap pieces onto a blueprint. Final tap activates something silly and useful! Random invention each play.",mechanic:"Step-by-step assembly (tap to add)",setting:"Rocky's Garage",episode:"Rocky's inventions throughout",scriptRef:"558157, 558184",similar:"Inventioneers, Toca Builders",why:"Building with clear blueprint is age-appropriate. Random inventions = replay. Essentially 'tap the glowing spot 4 times' — less environmental reading than top-tier."},
+  {pup:"rocky",name:"Veggie Harvester",stars:4,pitch:"Harvest time! Tap ripe veggies to pick them, drag to basket. Green tomatoes get 'Not yet!' Carrots need pull-up swipe. Corn needs 3-step husking!",mechanic:"Tap to pick + drag to basket",setting:"Farmer Yumi's Farm",episode:"S10 farm/harvest episodes",scriptRef:"570897, 597929",similar:"Toca Life: Farm, Sago Mini Farm",why:"Ripe vs not-ripe discrimination is educational. Multi-step husking adds depth. May feel too calm for mission mode."},
+  {pup:"rocky",name:"Wheel Fixer",stars:4,pitch:"Flat tire! Tap lug nuts to loosen (they spin off!), drag old tire away, drag new tire on, tap nuts back. Rocky tightens — *vrrrr!* Different vehicles each time.",mechanic:"Spin to loosen + swap + tighten",setting:"Adventure Bay road / near farm",episode:"S10 \"Pups Save The Buggy Trekkers\"",scriptRef:"612119, 612671",similar:"Fiete Cars, Dr. Panda Garage",why:"Step-by-step sequence is satisfying. Different vehicles = variety. Doesn't use recycling — more generic mechanic."},
+  {pup:"rocky",name:"Birdhouse Builder",stars:4,pitch:"Birds need a home! Drag recycled parts to blueprint spots — snap with hammer sounds. Bird family flies in when complete. Final stage: pick a paint color!",mechanic:"Assemble from parts (drag to blueprint)",setting:"Farmer Yumi's Farm — tree area",episode:"Animal habitat themes S10–12",scriptRef:"N/A",similar:"LEGO DUPLO World, Pango Build Park",why:"Assembly + decoration proven. Bird family payoff is emotional. Paint color = creative replay. No direct script reference."},
+
+  // RUBBLE
+  {pup:"rubble",name:"Dig & Discover",stars:5,pitch:"Buried treasures under Farmer Yumi's field! Swipe to scoop dirt, revealing pup treats, coins, and bones. Layers of soil → clay → rock build to a golden pup treat!",mechanic:"Swipe to dig + tap to collect",setting:"Farmer Yumi's Farm",episode:"S10 digging episodes",scriptRef:"557982, 565417",similar:"Sago Mini Trucks and Diggers (top-10 toddler app)",why:"Digging + discovery is one of THE most proven preschool mechanics. Layered terrain adds depth. Surprise reveals drive replay. Farm setting."},
+  {pup:"rubble",name:"Boulder Basher",stars:5,pitch:"Boulders blocking the road! Tap rapidly with Rubble's jackhammer — cracks spread with crunching sounds until it crumbles to dust. A kitten hides behind the final boulder!",mechanic:"Rapid tap to smash",setting:"Adventure Bay road to farm",episode:"S10 \"Pups Stop a Gold Finding Machine\"",scriptRef:"558796, 587098",similar:"Ice Crush, BabyBus demolition games",why:"Rapid tapping is THE easiest motor skill. Crack-and-crumble is universally satisfying. Jackhammer is Rubble's coolest tool. Kitten surprise = comedy."},
+  {pup:"rubble",name:"Crane Stacker",stars:4,pitch:"Rubble's crane swings with a block — tap to release at the right moment to stack! Generous snap tolerance. Wind gusts change patterns later.",mechanic:"Swing + release (timing tap)",setting:"Rocky's Garage / construction area",episode:"S12 \"Pups Stop a Topiary Tal\"",scriptRef:"550127, 563185",similar:"Stack (massively popular), LEGO DUPLO World",why:"Stacking is proven and timeless. Wind gusts add environmental reading. Generous tolerance. Common genre — less distinctly PAW Patrol."},
+  {pup:"rubble",name:"Sandcastle Builder",stars:5,pitch:"Beach day! Swipe to scoop sand into buckets, tap to flip into towers, then decorate with shells, flags, and seaweed. Three stages: scoop → build → decorate.",mechanic:"Scoop + place + decorate",setting:"Adventure Bay Beach",episode:"Beach episodes S10–12",scriptRef:"554064, 595499",similar:"Sago Mini Ocean Swimmer, Toca Life: Vacation, Kidlo",why:"Sand play universally beloved. Multi-phase keeps it engaging. Decoration choices add creative expression. Beach is evergreen. Building = Rubble."},
+  {pup:"rubble",name:"Path Paver",stars:3,pitch:"Path to the farm has holes! Drag matching stone shapes from Rubble's truck to fill each gap. Character walks happily on completed path.",mechanic:"Drag pavers into gaps",setting:"Adventure Bay — town to farm",episode:"S10 path/road episodes",scriptRef:"560193",similar:"Busy Shapes",why:"Shape matching works but very similar to Rocky's Fix the Fence. Less exciting than digging or smashing."},
+  {pup:"rubble",name:"Muddy Rescue",stars:5,pitch:"Farmer Al's tractor stuck in the mud! Tap to attach winch — *clink!* — then swipe repeatedly to pull free. Mud squelches until — *SCHLOOP!* Final round: embarrassed Humdinger.",mechanic:"Winch + pull (swipe)",setting:"Farmer Yumi's Farm — muddy field",episode:"S10 farm scenarios",scriptRef:"612343, 612428",similar:"YovoGames Truck games, tow truck toddler games",why:"Swipe-to-pull is physical and satisfying. Mud squelch sounds are comedy GOLD. *SCHLOOP* pop-free is perfect payoff. Humdinger getting stuck = on-brand."},
+  {pup:"rubble",name:"Snow Shoveler",stars:4,pitch:"Snow covered the paths! Swipe to clear — surprise items appear underneath (frozen flower, pup treat, silly frozen rubber duck). More swipes for deeper drifts.",mechanic:"Swipe to push/clear",setting:"Adventure Bay — after snowfall",episode:"S10 \"Pups Save a Wind-Swept Polar Bear Cub\"",scriptRef:"559181, 584863",similar:"Sago Mini Trucks and Diggers",why:"Swipe-to-clear with hidden discoveries. Surprise items drive replay. Similar to Dig & Discover — pick one or differentiate more."},
+  {pup:"rubble",name:"Hole Filler",stars:3,pitch:"Potholes everywhere! Rubble scoops dirt — tilt to pour into each hole. Fill meter rises. Tap to compact smooth.",mechanic:"Scoop + dump (tilt pour)",setting:"Adventure Bay road/park",episode:"S10 \"Pups Save the Buggy Trekkers\"",scriptRef:"618418, 682960",similar:"Sago Mini Trucks and Diggers",why:"Tilt-to-pour is fun but 'filling potholes' is less exciting than digging for treasure. More utilitarian."},
+  {pup:"rubble",name:"Garden Planter",stars:5,pitch:"Farmer Yumi needs veggies! Rubble digs rows (swipe), tap to drop seeds, swipe watering can — then TIME LAPSE: plants sprout and grow right before their eyes!",mechanic:"Dig + plant + water (multi-step)",setting:"Farmer Yumi's Farm",episode:"S10 farm/growing themes",scriptRef:"566039",similar:"Sago Mini Farm (top activity), Toca Life: Farm",why:"Planting + growth time-lapse is MAGIC — Sago Mini Farm proves top-performing. Three distinct phases. Growth animation is the 'wow' moment. Farm setting."},
+  {pup:"rubble",name:"Demolition Day",stars:4,pitch:"Old shed needs to come down! Rubble's wrecking ball swings — tap when aimed at highlighted section. Funny debris pops out (springs, rubber ducks, confetti).",mechanic:"Tap to swing wrecking ball (timing)",setting:"Adventure Bay — old building site",episode:"S12 \"Pups Stop a Topiary Tal\"",scriptRef:"557313, 565473",similar:"Wrecking Ball, physics destruction games",why:"Controlled destruction is endlessly satisfying. Funny debris = surprise. Destruction framing might concern parent-gatekeepers."},
+
+  // ZUMA
+  {pup:"zuma",name:"Hovercraft Racer",stars:4,pitch:"Zuma zips through the waterways! Tilt to steer, collect treats, avoid driftwood. Ramp jumps launch him into the air with splash landings!",mechanic:"Tilt to steer",setting:"Adventure Bay waterway / coast",episode:"S10 \"Pups Save The Wacky Water Skiers\"",scriptRef:"554395, 554605",similar:"Sago Mini Boats, LEGO DUPLO Train",why:"Tilt-on-water is natural and exciting. Ramp jumps are thrilling. Continuous tilt may tire small hands — needs rest moments."},
+  {pup:"zuma",name:"Life Ring Toss",stars:4,pitch:"People floating in the bay! Swipe to toss a life ring — arc guide shows trajectory. Person grabs it and Zuma pulls them in. 'Thanks!'",mechanic:"Swipe to throw (aim + power)",setting:"Adventure Bay docks / bay",episode:"S10 water rescues",scriptRef:"237663, 550362",similar:"Toca Kitchen swipe-to-toss, Dunk Hit simplified",why:"Swipe-to-throw is satisfying. Life ring is core rescue gear. Arc aiming harder for 3-year-olds — needs generous landing zones."},
+  {pup:"zuma",name:"Bubble Pop Dive",stars:5,pitch:"Zuma dives underwater! Colorful bubbles float up — tap to pop them revealing hidden treasures. Some have bonus treats! Find Cap'n Turbot's lost telescope.",mechanic:"Tap to pop bubbles + find items",setting:"Underwater — Adventure Bay bay",episode:"S10 \"Pups Save an Underwater Otis\"",scriptRef:"596107, 596116",similar:"Pop the Bubbles (top-rated toddler category), BabyBus bubbles",why:"Bubble popping is one of THE most addictive toddler mechanics. Hidden-object reveals add depth. Underwater is captivating. Easiest motor skill — just tap."},
+  {pup:"zuma",name:"Current Rider",stars:4,pitch:"Objects floating downstream from the farm! Three lanes — tap to switch, grab fruit, dodge logs. Basket fills as you collect.",mechanic:"Tap to switch lanes (3 lanes)",setting:"River through Adventure Bay",episode:"S12 \"Pups Save a Swept-Away Sweetheart\"",scriptRef:"635153, 759673",similar:"Subway Surfers (simplified), Temple Run",why:"Lane-switching is simple and proven. River creates natural pacing. Some 3-year-olds may default to one lane."},
+  {pup:"zuma",name:"Seal Herder",stars:4,pitch:"Baby seals scattered in the bay! Steer Zuma near them — they start following. Guide along a glowing path to Seal Island. Baby seal honks!",mechanic:"Steer + guide (move toward goal)",setting:"Adventure Bay bay / Seal Island",episode:"S10 bay/seal episodes",scriptRef:"553286, 554287",similar:"Sago Mini Ocean Swimmer, Toca Life: Farm",why:"Gentle herding is satisfying. Baby seal sounds adorable. Canon location. 'Steering near something' is somewhat passive."},
+  {pup:"zuma",name:"Flounder Finder",stars:5,pitch:"Cap'n Turbot's Flounder lost in the fog! Tap to send sonar pings — objects glow briefly. Steer toward the glow. Fog thickens, decoy boats appear!",mechanic:"Sonar ping + steer",setting:"Open bay waters",episode:"S10 \"Pups Save a Disappearing Flounder\"",scriptRef:"595830, 669876",similar:"Marco Polo concept — NOVEL mechanic, no exact match",why:"Sonar/echolocation is genuinely NOVEL — nothing else does this. Novelty drives discovery. Tap→glow→navigate = perfect environmental reading. Flounder is one of the most frequently rescued objects."},
+  {pup:"zuma",name:"Splash Jumper",stars:3,pitch:"Puddles after rain! Zuma zooms along — small puddles: jump over. Big puddles: splash through. Read the icon for each action.",mechanic:"Timing tap (jump or splash)",setting:"Adventure Bay — puddles",episode:"General rainy episodes",scriptRef:"668537, 733079",similar:"Talking Tom Gold Run, Subway Surfers simplified",why:"Discrimination task is educational but jump-vs-splash icons may be too fast for 3-year-olds. Doesn't use Zuma's tools. Generic runner."},
+  {pup:"zuma",name:"Fish Feeder",stars:3,pitch:"Cap'n Turbot studying fish — feed the right color when it swims past! Tap to drop food at the right moment.",mechanic:"Color match + timing tap",setting:"Adventure Bay bay / docks",episode:"S11 Turbot fish episodes",scriptRef:"680519, 680612",similar:"Baby Shark apps, Sago Mini Ocean Swimmer",why:"Educational but doesn't feel like a rescue. Zuma feels like observer, not hero. Low excitement vs Bubble Pop or Flounder Finder."},
+  {pup:"zuma",name:"Waterfall Explorer",stars:5,pitch:"Hidden cave behind the waterfall! Tilt to navigate upstream, collect crystals. Swipe through the water curtain — discover the secret cave! Tap crystals to fill a lantern.",mechanic:"Steer + discover (hidden cave)",setting:"River / waterfall area",episode:"S10 adventure/exploration episodes",scriptRef:"555907, 555924",similar:"Sago Mini Ocean Swimmer, Toca Life: Vacation",why:"Journey → discovery → treasure is the most compelling arc for this age. Cave behind waterfall = pure childhood magic. Swiping through water = satisfying reveal. Multi-phase depth."},
+  {pup:"zuma",name:"Dock Rescue",stars:3,pitch:"Things falling off the dock! Swipe Zuma left/right to catch before they hit the water. Caught items stack in hovercraft.",mechanic:"Position + catch (timing)",setting:"Adventure Bay docks",episode:"S10 dock episodes",scriptRef:"383672",similar:"Egg Catcher — most generic catch-falling-items",why:"Catch mechanics work but this is the most generic mechanic possible. Doesn't feel uniquely PAW Patrol or Zuma."},
+
+  // EVEREST
+  {pup:"everest",name:"Snowplow Path",stars:5,pitch:"Heavy snow blocking the mountain road! Swipe to plow through with the Snowcat — darker piles have hidden rocks (swerve!). Ice patches make you slide.",mechanic:"Swipe to plow + dodge",setting:"Mountain road / path to Jake's",episode:"S10 snow/mountain episodes",scriptRef:"559180",similar:"Sago Mini Trucks and Diggers, Snow Plow Truck Sim",why:"Swipe-to-clear is simplest gesture. Rock-dodging by reading snow color = environmental reading. Snowcat = Everest's vehicle. Mountain = her terrain."},
+  {pup:"everest",name:"Ice Bridge Maker",stars:4,pitch:"Gap in the mountain path! Trace with your finger to freeze an ice bridge. Character walks across. Tap snowflakes to reinforce thin spots.",mechanic:"Spray + freeze (trace path)",setting:"Mountain — over a crevasse",episode:"Mountain rescue episodes S10–12",scriptRef:"559490, 622368",similar:"Where's My Water?, 123Draw",why:"Trace-to-create-ice is magical. 'Make bridge thick enough' may be abstract for 3-year-olds. Needs generous success thresholds."},
+  {pup:"everest",name:"Avalanche Alert",stars:4,pitch:"Snowballs rolling down the mountain! Tap to smash with Everest's grapple hook. Bigger ones need 2 taps. Faster each round!",mechanic:"Tap to redirect/smash snowballs",setting:"Mountain slope",episode:"S10 snow/wind danger",scriptRef:"583084, 583143",similar:"Fruit Ninja simplified, BabyBus tap games",why:"Tap-to-smash is proven. Similar to Rubble's Boulder Basher — differentiate by making this more about timing (moving toward you)."},
+  {pup:"everest",name:"Penguin Slide",stars:5,pitch:"Baby penguin needs to reach the ocean! Tilt to steer down a winding ice path, collecting fish. Mama waits at the bottom — SPLASH!",mechanic:"Tilt to steer (sliding)",setting:"Mountain — ice slope to bay",episode:"S11 \"Pups Save the Lost Penguin\"",scriptRef:"653964, 653993",similar:"Alto's Adventure simplified, Sago Mini Snow Day",why:"Penguins universally adored. Tilting on ice = slippery fun. Fish collection. Mama reunion = emotional payoff kids want to experience again. Mountain-to-ocean journey."},
+  {pup:"everest",name:"Hot Cocoa Delivery",stars:4,pitch:"Jake wants cocoa delivered! Tilt to balance the tray as Snowcat drives bumpy mountain paths. Reach each cabin — character sips with warm smile.",mechanic:"Balance + deliver (tilt to keep steady)",setting:"Mountain path to cabins",episode:"S12 \"Pups Save The Hot Springs\"",scriptRef:"633391, 697933",similar:"Waiter game apps, Toca Kitchen",why:"Tilt-to-balance is natural. Delivering warm drinks in snow = cozy vibes. Balance games can frustrate — needs very forgiving physics."},
+  {pup:"everest",name:"Frozen Friend Thaw",stars:5,pitch:"Frost everywhere! Animals slipping on ice. Rub circles with your finger — ice melts with sparkles and steam. Animals do happy dances. Silly duck frozen in a ridiculous pose!",mechanic:"Trace circles to warm up (rub)",setting:"Mountain / forest edge",episode:"S10 \"Pups Save a Wind-Swept Polar Bear Cub\"",scriptRef:"558739, 559069",similar:"Peekaboo Barn, Sago Mini Snow Day, scratch-to-reveal",why:"Rubbing is THE most natural toddler gesture — literally what babies do on screens. Ice-melting with sparkles is magical. Zero frustration — you can't fail at rubbing."},
+  {pup:"everest",name:"Grapple Hook Swing",stars:4,pitch:"Swipe to launch grapple at cliff anchors — Everest swings across! Tap to release at the right moment. Three swings to reach the stranded climber.",mechanic:"Aim + swing (swipe to launch, tap to release)",setting:"Mountain cliffside",episode:"Everest grapple hook usage",scriptRef:"574908, 634004",similar:"Cut the Rope, Spider-Man kids games",why:"Swinging is exciting. Grapple hook = signature tool. 3-step aim-swing-release may be complex for 3-year-olds. Better for 4+."},
+  {pup:"everest",name:"Snow Sculpture",stars:4,pitch:"Snow day! Trace shapes to build 3D snow figures, then decorate with buttons, scarves, carrots. Pick a paint color at the end!",mechanic:"Trace shape + decorate",setting:"Outside Jake's lodge",episode:"Winter fun episodes",scriptRef:"583061, 584258",similar:"Sago Mini Snow Day, Toca Hair Salon",why:"Creative expression + tracing. Decoration adds replay. Similar to Cloud Painter and Loop-de-Loop — may be too many trace-and-decorate games."},
+  {pup:"everest",name:"Caribou Rescue Sled",stars:5,pitch:"Baby caribou is hurt — drag onto Everest's sled (it snuggles in!). Tilt to steer downhill, collecting blankets that auto-wrap around the caribou. Reach Jake's lodge!",mechanic:"Load + steer (drag then tilt)",setting:"Mountain — snowy slope",episode:"S10 \"Pups Save a Baby Caribou\"",scriptRef:"587168",similar:"Sago Mini Snow Day, rescue/ambulance games",why:"Nurturing (loading gently) + exciting sledding = perfect emotional range. Blankets auto-wrapping = visual warmth. Directly from S10. Makes kids say 'again!' immediately."},
+  {pup:"everest",name:"Ice Crystal Collector",stars:4,pitch:"Crystal cave on the mountain! Tap formations to chip crystals free — sparkle + chime. Climb to higher ledges. Fill a jar to create a lantern!",mechanic:"Tap to chip ice + collect",setting:"Mountain cave",episode:"Cave exploration S10–12",scriptRef:"583319",similar:"Archaeologist: Jurassic Life, gem mining games",why:"Tap-to-chip with sparkle effects is satisfying. Cave exploration exciting. Climbing adds navigation complexity that may slow the 60-90s flow."},
+
+  // TRACKER
+  {pup:"tracker",name:"Sound Spotter",stars:5,pitch:"Farm animals hiding and calling! A sound plays (moo, baa, cluck) — tap WHERE it came from on the farm. Tracker runs there and finds the animal! Later: two sounds at once.",mechanic:"Listen + tap the source",setting:"Farmer Yumi's Farm",episode:"Tracker's super-hearing S10",scriptRef:"554547, 555632",similar:"Peekaboo Barn (highest-rated toddler app ever)",why:"Audio-based environmental reading is completely UNIQUE. Peekaboo Barn proves audio-reveal is top-tier. Super hearing IS Tracker. Farm sounds familiar to every 3-year-old."},
+  {pup:"tracker",name:"Vine Swinger",stars:3,pitch:"Tracker crosses through tall trees using cables! Tap when each cable swings right. A squirrel hops on mid-swing!",mechanic:"Tap to grab + release (timing)",setting:"Trees near farm / forest edge",episode:"Tracker cable abilities",scriptRef:"557031, 557668",similar:"Spider-Man kids games, Cut the Rope",why:"Swinging is fun but very similar to Everest's Grapple Hook Swing. Timing-based swinging harder for 3-year-olds."},
+  {pup:"tracker",name:"Trail Tracker",stars:4,pitch:"Follow a clue trail from town to farm! Tap glowing footprints. At forks, listen to directional sound cues. Prints fade — rely more on listening.",mechanic:"Follow path + choose direction",setting:"Adventure Bay — town to farm",episode:"S10 tracking themes",scriptRef:"554547, 555632",similar:"PBS Kids Games trail activities, Nick Jr. app",why:"Visual-to-audio transition is educationally rich. Tracking = Tracker's name. Similar to Chase's Lost Puppy Tracker — audio forks differentiate it."},
+  {pup:"tracker",name:"Bug Catcher",stars:4,pitch:"Hungry bugs munching Farmer Yumi's crops! Scan for wiggling antennae, tap to catch in a jar. Don't catch butterflies — they're helpers!",mechanic:"Spot + tap (environmental scan)",setting:"Farmer Yumi's Farm — crops",episode:"S10 bugs/crops + S12 farm",scriptRef:"586053, 765638",similar:"Sago Mini Bug Builder, Highlights Hidden Pictures",why:"Scanning + discrimination is cognitively engaging. Farm crop protection gives urgency. 'Catch bugs' is less exciting than 'rescue animal' for this age."},
+  {pup:"tracker",name:"Rope Bridge Builder",stars:3,pitch:"Bridge out! Draw lines between color-coded anchor points on both sides of the creek. Planks appear when cables connect!",mechanic:"Connect points (draw line between anchors)",setting:"Adventure Bay — over the creek",episode:"Tracker cable/rope expertise",scriptRef:"158697",similar:"Connect the Dots, LEGO DUPLO World bridge",why:"Color matching + drawing is age-appropriate. Very similar to Rocky's Bridge Builder. Pick one pup for the bridge game."},
+  {pup:"tracker",name:"Whisper Relay",stars:4,pitch:"Listen to a sequence of sounds, tap matching icons in order! Tracker's ears wiggle with correct answers. Sequences grow from 2 to 4.",mechanic:"Listen + repeat sequence (simon says)",setting:"Adventure Bay / Lookout",episode:"Tracker listening S10",scriptRef:"569370, 602323",similar:"Simon Says, Baby Piano",why:"Simon Says is timeless and proven. Audio focus leverages Tracker's ability. More educational than rescue — harder to fit mission mode."},
+  {pup:"tracker",name:"Night Watch",stars:5,pitch:"Night at the farm! Dark screen with flashlight following your finger. Sounds play from different directions — drag beam toward each sound. Illuminate critters — they wave and scurry off.",mechanic:"Listen + shine spotlight",setting:"Farmer Yumi's Farm — nighttime",episode:"S11 \"Pups Save The Big Nightlight\"",scriptRef:"447660, 676018",similar:"Peekaboo Barn (millions of downloads), Sago Mini Night Walk",why:"Flashlight-in-dark is ELITE toddler mechanic — peek-a-boo + cause-and-effect + agency. Directional audio cues make it unique. Nighttime farm is atmospheric."},
+  {pup:"tracker",name:"Fruit Picker Extreme",stars:3,pitch:"High fruit in the orchard! Swipe to launch Tracker's cable lasso, fruit falls, tap to catch in basket. Hidden fruit behind leaves needs revealing.",mechanic:"Swing cable + collect (aim + timing)",setting:"Farmer Yumi's Farm — orchard",episode:"S10 farm/harvest",scriptRef:"N/A",similar:"Toca Life: Farm, similar to Rocky's Veggie Harvester",why:"Two-phase is engaging but similar to Rocky's Veggie Harvester. Cable-as-lasso for fruit is a stretch. No script reference."},
+  {pup:"tracker",name:"Animal Choir",stars:4,pitch:"Tracker conducts a farm animal orchestra! Tap animals in order to match a melody shown as colored notes. Three songs for a full concert!",mechanic:"Tap animals to make music (sequencing)",setting:"Farmer Yumi's Farm — barn",episode:"S12 \"Pups Save The Adventure Bay Boogie\"",scriptRef:"278514, 767053",similar:"Baby Piano, Toca Band",why:"Music sequencing is engaging. Farm animals as instruments is funny. Pattern-following 3+ notes requires working memory still developing at age 3."},
+  {pup:"tracker",name:"Maze Runner",stars:4,pitch:"Farmer Yumi's corn maze! Swipe to move through paths. Tracker's ears wiggle toward the right direction. Ryder's call gets louder near the exit. Secret shortcut through the corn!",mechanic:"Swipe to move + audio hints",setting:"Farmer Yumi's corn maze",episode:"S10 corn maze",scriptRef:"623261, 623544",similar:"Labyrinth 2 simplified, PBS Kids maze games",why:"Mazes are proven preschool mechanic. Audio guidance guarantees success. Corn maze = farm setting. Secret shortcut = perfect Tracker moment."},
+];
+
+const missions = [
+  {name:"Farm Rescue Mission",steps:[{pup:"chase",game:"Megaphone Herder",type:"directional taps — herding"},{pup:"rocky",game:"Fix the Fence",type:"shape matching — building"},{pup:"rubble",game:"Garden Planter",type:"dig + plant + water — multi-stage"}]},
+  {name:"Beach Rescue Mission",steps:[{pup:"skye",game:"Sky Scanner",type:"scan from above — spotting"},{pup:"zuma",game:"Life Ring Toss",type:"aim + throw — action"},{pup:"marshall",game:"Pup Wash Station",type:"swipe + rinse — care"}]},
+  {name:"Mountain Rescue Mission",steps:[{pup:"tracker",game:"Sound Spotter",type:"listen + tap — audio"},{pup:"everest",game:"Snowplow Path",type:"swipe to plow — clearing"},{pup:"chase",game:"Lost Puppy Tracker",type:"follow trail — scanning"}]},
+  {name:"Garage Fix-It Mission",steps:[{pup:"rocky",game:"Tool Matcher",type:"match silhouettes — sorting"},{pup:"rubble",game:"Boulder Basher",type:"tap to smash — action"},{pup:"rocky",game:"Pipe Connector",type:"rotate to connect — puzzle"}]},
+  {name:"Storm Cleanup Mission",steps:[{pup:"chase",game:"Net Catcher",type:"timing tap — catching"},{pup:"skye",game:"Harness Airlift",type:"fly + grab + deliver — rescue"},{pup:"rocky",game:"Grabber Claw Cleanup",type:"position + grab — crane"}]},
+  {name:"Night Patrol Mission",steps:[{pup:"tracker",game:"Night Watch",type:"flashlight + sound — spotting"},{pup:"skye",game:"Goggles Night Vision",type:"spotlight search — finding"},{pup:"everest",game:"Frozen Friend Thaw",type:"rub to melt — care"}]},
+  {name:"Farmer Yumi Special Mission",steps:[{pup:"tracker",game:"Bug Catcher",type:"scan + tap — protecting"},{pup:"rubble",game:"Dig & Discover",type:"swipe to dig — discovery"},{pup:"rocky",game:"Veggie Harvester",type:"tap + drag — collecting"}]},
+];
+
+// Render
+const grid = document.getElementById('game-grid');
+const countEl = document.querySelector('.count');
+const pupBtns = document.querySelectorAll('.pup-btn');
+const starFilter = document.querySelector('.star-filter');
+const sortSelect = document.querySelector('.sort-select');
+const searchInput = document.querySelector('.search-input');
+const tabBtns = document.querySelectorAll('.tab-btn');
+
+let activePup = 'all';
+let minStars = 0;
+let sortBy = 'rating';
+let searchTerm = '';
+
+function starStr(n) { return '⭐'.repeat(n); }
+
+function renderCards() {
+  let filtered = games.filter(g => {
+    if (activePup !== 'all' && g.pup !== activePup) return false;
+    if (g.stars < minStars) return false;
+    if (searchTerm && !`${g.name} ${g.pitch} ${g.mechanic} ${g.pup} ${g.setting}`.toLowerCase().includes(searchTerm)) return false;
+    return true;
+  });
+  if (sortBy === 'rating') filtered.sort((a,b) => b.stars - a.stars || a.name.localeCompare(b.name));
+  else if (sortBy === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+  else if (sortBy === 'pup') filtered.sort((a,b) => a.pup.localeCompare(b.pup) || b.stars - a.stars);
+
+  grid.innerHTML = filtered.map(g => `
+    <div class="card" data-pup="${g.pup}">
+      <div class="card-head">
+        <div class="card-title">${g.name}</div>
+        <div class="card-stars">${starStr(g.stars)}</div>
+      </div>
+      <span class="card-pup ${g.pup}">${g.pup.charAt(0).toUpperCase()+g.pup.slice(1)}</span>
+      <span class="card-mechanic">${g.mechanic}</span>
+      <div class="card-setting">📍 ${g.setting}</div>
+      <p class="card-pitch">${g.pitch}</p>
+      <details class="card-details">
+        <summary>Details</summary>
+        <div class="detail-section"><strong>Episode:</strong> ${g.episode}</div>
+        <div class="detail-section"><strong>Script lines:</strong> ${g.scriptRef}</div>
+        <div class="detail-section"><strong>Similar games:</strong> ${g.similar}</div>
+        <div class="detail-section"><strong>Rating rationale:</strong> ${g.why}</div>
+      </details>
+    </div>
+  `).join('');
+  countEl.textContent = `${filtered.length} / ${games.length} games`;
+}
+
+function renderMissions() {
+  document.getElementById('tab-missions').innerHTML = `<div class="missions"><h2>🎯 Mission Pairings (3 games = 1 mission)</h2><p style="color:var(--muted);margin-bottom:1rem;">Alternate mechanic types with 5-second Ryder narrative bridges between games.</p>${missions.map(m => `
+    <div class="mission-card">
+      <h3>${m.name}</h3>
+      ${m.steps.map((s,i) => `<div class="mission-step"><div class="mission-num">${i+1}</div><span class="card-pup ${s.pup}" style="margin:0">${s.pup.charAt(0).toUpperCase()+s.pup.slice(1)}</span> <strong>${s.game}</strong> <span style="color:var(--muted);font-size:.8rem;">(${s.type})</span></div>`).join('')}
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderDesign() {
+  document.getElementById('tab-design').innerHTML = `
+  <div class="design-section">
+    <h2>📐 Design Principles for Ages 3–4 on Mobile</h2>
+    <h3>🧠 Cognitive (Piaget's Preoperational Stage)</h3>
+    <ul>
+      <li><strong>Cannot infer abstract goals.</strong> Show the goal state visually before play starts</li>
+      <li><strong>Cannot take others' perspectives.</strong> Use exaggerated audio + visual cues</li>
+      <li><strong>Limited executive function.</strong> One active mechanic at a time</li>
+      <li><strong>Leverage existing mental models.</strong> Hose sprays water. Crane picks things up. Don't invent abstractions</li>
+      <li><strong>Show, don't tell.</strong> Animated instruction → goal state → "Your turn!"</li>
+    </ul>
+    <h3>✋ Motor Skills (NNGroup research)</h3>
+    <ul>
+      <li><strong>Gross motor only.</strong> Tap and swipe are reliable. Dragging is borderline</li>
+      <li><strong>Big touch targets.</strong> Minimum 48pt, ideally 64pt+</li>
+      <li><strong>No precision required.</strong> Generous hit boxes. "Close enough" counts</li>
+      <li><strong>Single-finger interaction.</strong> No pinch, no multi-touch</li>
+    </ul>
+    <h3>📊 Engagement (from Mixpanel data)</h3>
+    <ul>
+      <li><strong>60–90 second sweet spot.</strong> Enough for accomplishment before win state</li>
+      <li><strong>"Environmental reading" mechanics win.</strong> Scanning, timing, spatial awareness > "tap until done"</li>
+      <li><strong>Replay rate >2.2× is the key metric.</strong> Build variation into each play</li>
+      <li><strong>Multi-stage structure.</strong> 2–3 short stages within 60–90s</li>
+      <li><strong>Always succeed.</strong> Mistakes slow you down but never cause failure</li>
+    </ul>
+    <h3>🎯 Mission Stringing (3 games = 1 mission)</h3>
+    <ul>
+      <li>Alternate mechanic types: scanning → action → building</li>
+      <li>Ryder bridge: 5-second narrative transition</li>
+      <li>Natural stopping point after celebration screen</li>
+    </ul>
+  </div>`;
+}
+
+pupBtns.forEach(btn => btn.addEventListener('click', () => {
+  pupBtns.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activePup = btn.dataset.pup;
+  renderCards();
+}));
+starFilter.addEventListener('change', () => { minStars = +starFilter.value; renderCards(); });
+sortSelect.addEventListener('change', () => { sortBy = sortSelect.value; renderCards(); });
+searchInput.addEventListener('input', () => { searchTerm = searchInput.value.toLowerCase(); renderCards(); });
+tabBtns.forEach(btn => btn.addEventListener('click', () => {
+  tabBtns.forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+}));
+
+function renderHumbots() {
+  const humbotMissions = [
+    {
+      id: 'a', name: 'Humbots on the Loose!', tone: 'Detective procedural — Spot → Fix → Recover',
+      arc: 'Escalating narrative: spot the thieves → fix their damage → recover the loot',
+      bestFor: 'Kids who like solving problems',
+      emotionalArc: 'Satisfaction (solved it)',
+      games: [
+        { pup: 'zuma', name: 'Humbot Spotter', isNew: true, mechanic: 'Sonar ping + spotlight scan from water',
+          flow: 'Humbots are sneaking along the pier at night, swiping fish from Cap\'n Turbot\'s crates! Zuma patrols the bay in his hovercraft. Tap to send sonar pings toward the pier — Humbots glow green when hit (they freeze with a funny "caught!" expression, arms sproing out). Tap each lit-up Humbot to tag it. Some hide behind barrels, under dock planks, or behind boats.',
+          stages: 'Pier section (3 Humbots, easy) → Boat dock (4, some behind boats) → End of pier (5, one stacked on another\'s shoulders trying to reach a high crate)',
+          humbotMoment: 'When pinged, they freeze in goofy poses. One drops a fish on its own head. One tries to tiptoe away but its spring legs make loud BOING sounds.',
+          evolves: 'Flounder Finder' },
+        { pup: 'rocky', name: 'Pier Patcher', isNew: true, mechanic: 'Match parts + drag to repair (shape matching)',
+          flow: 'The Humbots knocked loose pier planks and broke crate lids while stealing fish! Rocky drives up with salvaged parts. Drag matching repair pieces to each damaged spot. Rocky\'s grabber tightens each piece with a satisfying *vrrrr!* Recycled materials include a surfboard as a plank and a stop sign as a railing.',
+          stages: 'Simple plank gaps (3 pieces) → Railing + planks (5 pieces, 2 shapes) → Full section with bolts + creative recycled pieces (7 pieces)',
+          humbotMoment: 'A forgotten Humbot is wedged under a plank, wiggling its spring arms. Rocky pulls it out and it waddles off embarrassed.',
+          evolves: 'Fix the Fence' },
+        { pup: 'rubble', name: 'Beach Dig Rescue', isNew: true, mechanic: 'Swipe to dig + tap to collect',
+          flow: 'Humbots buried their stolen loot in the sand before the pups caught them! Rubble\'s bulldozer scoops sand as player swipes. Under the sand: Mr. Porter\'s pie tin, Cap\'n Turbot\'s telescope, Farmer Yumi\'s prize ribbon. Some "treasures" are just Humbot junk (tiny top hat, broken spring arm — funny!).',
+          stages: 'Shallow sand (easy, big items) → Deeper with shells mixed in → Rocky area where one Humbot is STILL trying to bury a fish — dig it up and it runs away: BOING BOING BOING',
+          humbotMoment: 'Final dig reveals a Humbot that fell asleep while burying stuff. It wakes up, looks around, and panics.',
+          evolves: 'Dig & Discover' }
+      ],
+      bridges: [
+        '"Great spotting, Zuma! But those Humbots left a mess on the pier. Rocky, can you fix the damage?"',
+        '"The pier looks great, Rocky! But Rubble, some Humbots escaped to the beach and buried the stuff they stole!"'
+      ]
+    },
+    {
+      id: 'b', name: 'Humbot Heist at the Harbor!', tone: 'Action chase — Protect → Pursue → Capture',
+      arc: 'Defend the beach → chase escapees across the bay → reclaim the beach',
+      bestFor: 'Kids who like action and speed',
+      emotionalArc: 'Triumph (caught them all!)',
+      games: [
+        { pup: 'rocky', name: 'Grabber Claw Guard', isNew: false, mechanic: 'Position + grab (crane game defense)',
+          flow: 'Humbots are launching themselves from a catapult on Foggy Bottom\'s shore, landing on the beach and grabbing things! Rocky\'s at the pier with his grabber claw extended. Position the claw over each landing Humbot and tap to grab before it snatches anything. Grabbed Humbots go into a collection crate (spring arms waving hilariously).',
+          stages: 'Slow launches, 1 at a time → Faster, 2 at a time → Fast + one GOLD Humbot that zigzags (bonus catch!)',
+          humbotMoment: 'Each grabbed Humbot makes a different sound — one says "uh oh" in a tiny robot voice, one\'s light flashes red, one goes limp and plays dead.',
+          evolves: 'Grabber Claw Cleanup' },
+        { pup: 'zuma', name: 'Hovercraft Chase', isNew: true, mechanic: 'Tilt to steer + tap to collect',
+          flow: 'Escaped Humbots are floating away on stolen surfboards, boogie boards, and inflatable flamingos! Zuma races across the bay. Tilt to steer toward each floating Humbot group. When close enough, tap to scoop them up with Zuma\'s rescue net. Humbots paddle hilariously with spring arms.',
+          stages: 'Calm water, Humbots in a line → Mild current, spread out → Choppy water, Humbots on an inflatable flamingo doing a conga line!',
+          humbotMoment: 'One Humbot is "surfing" standing up, waving at Zuma like it\'s on vacation. Another falls off its board and doggy-paddles with spring arms.',
+          evolves: 'Hovercraft Racer' },
+        { pup: 'rubble', name: 'Sandcastle Smash & Build', isNew: true, mechanic: 'Tap to smash + scoop to build (two-phase)',
+          flow: 'Remaining Humbots built a goofy sand fortress (shaped like Humdinger\'s face!) and are hiding inside! Phase 1: Tap fortress walls to knock them down with Rubble\'s wrecking ball — Humbots scatter with each hit. Phase 2: Use the cleared sand to build a REAL sandcastle! Scoop, flip, decorate.',
+          stages: 'Smash 3 fortress walls (Humbots pour out like clowns from a car) → Build 3-tower castle → Bonus: A Humbot waddles over and places a tiny flag on your castle',
+          humbotMoment: 'The sand fortress has Humdinger\'s mustache sculpted on it. When smashed, one Humbot salutes the falling mustache sadly.',
+          evolves: 'Sandcastle Builder + Demolition Day' }
+      ],
+      bridges: [
+        '"Nice grabbing, Rocky! But some Humbots got past us and they\'re escaping across the bay! Zuma, after them!"',
+        '"Way to ride, Zuma! Rubble, there are Humbots on the beach building something — let\'s find out what!"'
+      ]
+    },
+    {
+      id: 'c', name: 'Humbots Ahoy!', tone: 'Mystery adventure — Discover → Build → Execute',
+      arc: 'Discover underwater evidence → build a clever trap → herd Humbots into it',
+      bestFor: 'Kids who like building things',
+      emotionalArc: 'Cleverness (outsmarted them!)',
+      games: [
+        { pup: 'zuma', name: 'Bubble Pop Recon', isNew: false, mechanic: 'Tap to pop bubbles + discover',
+          flow: 'Something\'s dumping junk in the bay! Zuma dives down with scuba gear. Pop bubbles to clear murky water — underneath, discover sunken Humbot parts (tiny top hats, spring arms, cracked head-lights) and stolen items. Collect stolen goods (glow gold) but leave Humbot junk (glow purple).',
+          stages: 'Shallow near pier (few bubbles, big items) → Mid-bay (more bubbles, smaller items) → Deep spot where a whole intact Humbot is sitting on the ocean floor waving for help',
+          humbotMoment: 'The sunken Humbot has a fish sitting on its head. When Zuma finds it, it gives a thumbs up with its spring arm. Even Humbots need rescuing sometimes!',
+          evolves: 'Bubble Pop Dive' },
+        { pup: 'rocky', name: 'Humbot Trap Builder', isNew: true, mechanic: 'Step-by-step invention assembly',
+          flow: 'Rocky examines clues and builds a Humbot trap on the pier! Player sees a blueprint — a conveyor belt leading to a collection bin with a fake "SHINY THINGS" sign. Tap to assemble each part from recycled materials: skateboard wheels → conveyor, beach umbrella → funnel, fishing net → catch basket. Test the trap with a decoy Humbot!',
+          stages: '4 parts to assemble (wheels → belt → funnel → net) → Activate and watch test run → Add a disco ball as bait (Humbots LOVE shiny)',
+          humbotMoment: 'During testing, the decoy Humbot gets distracted by the disco ball and starts "dancing" (bouncing on its springs) before falling into the trap.',
+          evolves: 'Invention Builder' },
+        { pup: 'rubble', name: 'Humbot Herder', isNew: true, mechanic: 'Directional bulldozer pushes (swipe to push sand walls)',
+          flow: 'Humbots scattered across the beach! Rubble pushes sand berms that guide them toward Rocky\'s trap. Swipe to push sand walls — Humbots bounce off and redirect. Like a pinball bumper puzzle! Guide groups up the pier and into the trap. They march in a line but the back ones keep bumping the front ones.',
+          stages: '3 Humbots, straight push → 5 Humbots, L-shaped path needed → 7 Humbots from multiple directions, build a funnel!',
+          humbotMoment: 'The last Humbot refuses to move until it finishes "burying" a stolen spoon. Rubble gently nudges it and it finally waddles toward the trap, grumbling in robot beeps.',
+          evolves: 'New mechanic' }
+      ],
+      bridges: [
+        '"Interesting — Humbots were using the pier as their escape route! Rocky, can you figure out how they were getting across?"',
+        '"The trap is set! Rubble, we need you to herd the remaining Humbots toward Rocky\'s trap!"'
+      ],
+      celebration: 'All captured Humbots are in the collection bin. Their head-lights flash in unison. One tiny arm reaches out waving a white flag (a napkin from Mr. Porter\'s). Ryder: "Great teamwork, pups! Let\'s get these Humbots back to Foggy Bottom!" Cut to: Humdinger opens his door to find a crate of returned Humbots. He opens it and they all spring out and scatter around his lair. He face-palms.'
+    },
+    {
+      id: 'd', name: 'Humbot Surf Day!', tone: 'Silly comedy — Block → Round Up → Clean',
+      arc: 'Whack-a-mole chaos → water roundup → satisfying cleanup',
+      bestFor: 'Kids who like silliness and laughing',
+      emotionalArc: 'Joy (laughed the whole time)',
+      games: [
+        { pup: 'rubble', name: 'Pier Protector', isNew: true, mechanic: 'Timing tap to block (whack-a-mole variant)',
+          flow: 'Humbots popping up through gaps in pier planks! They peek their top hats up, grab whatever\'s nearby (fishing rod, sandwich, seagull), and duck back down. Tap each the moment it pops up — Rubble bonks it gently with his shovel and it drops back dizzy (stars circle its head). Miss and it steals the item, head-light flashing purple victoriously.',
+          stages: 'Slow pop-ups, 3 holes → Faster, 5 holes → Rapid + fake-outs (a regular crab pops up — don\'t bonk the crab! It snaps at you)',
+          humbotMoment: 'One Humbot pops up wearing sunglasses and holding a tiny surfboard. It poses before Rubble bonks it. Another pops up, sees Rubble waiting, and slowly retreats back down on its own.',
+          evolves: 'New mechanic' },
+        { pup: 'zuma', name: 'Life Ring Roundup', isNew: false, mechanic: 'Swipe to throw + aim (life ring lasso)',
+          flow: 'Escaped Humbots bobbing in the bay, clinging to stolen floaties and pool noodles! Swipe to toss life rings around each group. Arc guide helps aim. When ringed, Zuma pulls them in — they slide across water making robot squealing sounds. Some try to paddle away when they see the ring coming.',
+          stages: 'Close, still water → Medium distance, light current → Far Humbots riding a stolen kayak in circles (moving target!)',
+          humbotMoment: 'One uses two stolen spatulas as paddles. When lassoed, it keeps paddling in the air. Another is floating on its back, completely relaxed, unaware.',
+          evolves: 'Life Ring Toss' },
+        { pup: 'rocky', name: 'Bay Cleanup Cruise', isNew: true, mechanic: 'Position grabber + sort (crane + sorting combo)',
+          flow: 'Rocky rides a cleanup barge. Water littered with floating items — stolen goods (glow gold, return to town) and Humbot junk (glow purple, recycle). Position grabber over items, tap to grab, drag to correct bin. "Bay health" meter fills as you clean. Some items are Humbots playing dead — they wiggle when grabbed (Humbot crate instead!).',
+          stages: 'Few items, clear water → More items, seaweed tangles → Busy bay with Humbots-playing-dead + a rubber duck that\'s just a rubber duck (Rocky: "Don\'t lose it, reuse it!")',
+          humbotMoment: 'One "dead" Humbot keeps peeking to see if Rocky\'s gone. When grabbed, it goes stiff again. Another is being used as a perch by a seagull — both get lifted together.',
+          evolves: 'Grabber Claw Cleanup + Sort & Recycle' }
+      ],
+      bridges: [
+        '"Ha! Those Humbots are sneaky but you\'re sneakier, Rubble! Zuma, some escaped into the water!"',
+        '"Awesome tossing, Zuma! Rocky, the bay\'s full of junk the Humbots dropped. Time for a cleanup!"'
+      ]
+    }
+  ];
+
+  const compareRows = [
+    { label: 'Tone', key: 'tone' },
+    { label: 'Best For', key: 'bestFor' },
+    { label: 'Emotional Arc', key: 'emotionalArc' },
+  ];
+
+  const el = document.getElementById('tab-humbots');
+  el.innerHTML = `
+    <div class="humbot-header">
+      <h2>🤖 Humbot Bay Missions</h2>
+      <p>Zuma · Rocky · Rubble — Water, Pier & Beach — 5 Minutes Each</p>
+    </div>
+    <div class="humbot-structure">
+      <h3>⏱️ 5-Minute Structure</h3>
+      <ul>
+        <li>3 minigames × 90 seconds = 4.5 min</li>
+        <li>2 Ryder bridges × 15 seconds = 0.5 min</li>
+        <li>Each opens with a Ryder alert: Humbots spotted near the bay!</li>
+      </ul>
+    </div>
+    ${humbotMissions.map(m => `
+      <div class="humbot-option" id="humbot-${m.id}">
+        <div class="humbot-option-head">
+          <h3>Option ${m.id.toUpperCase()}: "${m.name}"</h3>
+          <span class="option-tag">${m.bestFor}</span>
+        </div>
+        <div class="option-tone">${m.tone}</div>
+        ${m.games.map((g, i) => `
+          <div class="humbot-game">
+            <div class="humbot-game-head">
+              <span class="card-pup ${g.pup}">${g.pup.charAt(0).toUpperCase()+g.pup.slice(1)}</span>
+              <h4>${g.name}</h4>
+              ${g.isNew ? '<span class="game-new">NEW</span>' : '<span class="game-evolved">EVOLVED</span>'}
+            </div>
+            <div class="game-mechanic">⚙️ ${g.mechanic}</div>
+            <div class="game-flow">${g.flow}</div>
+            <div class="game-stages"><strong>Stages:</strong> ${g.stages}</div>
+            ${g.evolves ? '<div style="font-size:.75rem;color:var(--muted);margin-top:.25rem;">Evolves from: <em>'+g.evolves+'</em></div>' : ''}
+            <div class="humbot-moment">🤖 ${g.humbotMoment}</div>
+          </div>
+          ${i < m.games.length - 1 ? '<div class="humbot-bridge">⟶ Ryder: '+m.bridges[i]+'</div>' : ''}
+        `).join('')}
+        ${m.celebration ? '<div class="humbot-celebration">🎉 <strong>Celebration:</strong> '+m.celebration+'</div>' : ''}
+      </div>
+    `).join('')}
+    <div class="humbot-structure" style="margin-top:1.5rem;">
+      <h3>📊 Mission Comparison</h3>
+      <table class="humbot-compare">
+        <tr><th></th>${humbotMissions.map(m => '<th>'+m.id.toUpperCase()+': '+m.name+'</th>').join('')}</tr>
+        <tr><td><strong>Tone</strong></td>${humbotMissions.map(m => '<td>'+m.tone.split('—')[0].trim()+'</td>').join('')}</tr>
+        <tr><td><strong>Arc</strong></td>${humbotMissions.map(m => '<td>'+m.arc+'</td>').join('')}</tr>
+        <tr><td><strong>Emotional Arc</strong></td>${humbotMissions.map(m => '<td>'+m.emotionalArc+'</td>').join('')}</tr>
+        <tr><td><strong>Best For</strong></td>${humbotMissions.map(m => '<td>'+m.bestFor+'</td>').join('')}</tr>
+        <tr><td><strong>Humbot Density</strong></td><td>Medium</td><td>High</td><td>High</td><td>Maximum</td></tr>
+        <tr><td><strong>New Mechanics</strong></td>
+          <td>Sonar+pier scan, pier repair, targeted dig</td>
+          <td>Crane defense, hovercraft chase, smash+build</td>
+          <td>Underwater recon, invention assembly, sand herding</td>
+          <td>Whack-a-mole, life ring lasso, crane+sort combo</td>
+        </tr>
+        <tr><td><strong>Evolves From</strong></td>
+          <td>Flounder Finder, Fix Fence, Dig & Discover</td>
+          <td>Grabber Claw, Hovercraft Racer, Sandcastle+Demolition</td>
+          <td>Bubble Pop, Invention Builder, New</td>
+          <td>New, Life Ring Toss, Grabber Claw+Sort & Recycle</td>
+        </tr>
+      </table>
+    </div>
+  `;
+}
+
+// ── Mission Script Editor ──────────────────────────────────────────
+const SCRIPT_DATA = [
+  {t:'noninteractive', x:'[ LETTERBOX IN — Non-Interactive Mode ]'},
+  {t:'scene', x:'EXT. ADVENTURE BAY - JET SKI RACE DOCK - DAY'},
+  {t:'action', x:'MAYOR GOODWAY stands at the dock podium, eyes closed, beaming. Gleaming jet skis float on the water in front of her.'},
+  {t:'character', x:'MAYOR GOODWAY'},
+  {t:'dialogue', x:'Welcome to the Adventure Bay Jet Ski Race!'},
+  {t:'transition', x:'CUT TO:'},
+  {t:'scene', x:'EXT. ADVENTURE BAY - DOCK - CONTINUOUS'},
+  {t:'action', x:'MAYOR HUMDINGER stands over a large wooden crate. He flings it open. HUMBOTS pour out — two-foot-tall robots with springy arms, purple top hats, and glowing green eyes.'},
+  {t:'character', x:'MAYOR HUMDINGER'},
+  {t:'dialogue', x:'My Humbots are programmed to steal anything and return it to Foggy Bottom! HAHAHAHA!'},
+  {t:'action', x:'The Humbots turn toward the jet skis. They chant in perfect unison, marching.'},
+  {t:'character', x:'HUMBOTS'},
+  {t:'parenthetical', x:'(in unison)'},
+  {t:'dialogue', x:'Steal everything! Steal everything!'},
+  {t:'action', x:'They grab the jet skis and roar away. One rides backwards. One stands with its spring arms spread wide like it\'s surfing. One clutches a stolen flag.'},
+  {t:'transition', x:'CUT BACK TO:'},
+  {t:'scene', x:'EXT. ADVENTURE BAY - JET SKI RACE DOCK - CONTINUOUS'},
+  {t:'action', x:'MAYOR GOODWAY opens her eyes. The jet skis are gone. She stares directly into camera. A long beat.'},
+  {t:'character', x:'MAYOR GOODWAY'},
+  {t:'dialogue', x:'Alright, contestant...'},
+  {t:'action', x:'She looks out at the empty water. Then back. Then out again.'},
+  {t:'character', x:'MAYOR GOODWAY'},
+  {t:'dialogue', x:'Wait! WHO STOLE THE JET SKIS!?'},
+  {t:'transition', x:'CUT TO:'},
+  {t:'scene', x:'EXT. ADVENTURE BAY - ON THE WATER - CONTINUOUS'},
+  {t:'action', x:'The HUMBOTS speed away on stolen jet skis, laughing.'},
+  {t:'character', x:'RYDER'},
+  {t:'parenthetical', x:'(O/S)'},
+  {t:'dialogue', x:'Zuma, catch up to those robots!'},
+  {t:'action', x:'Camera PULLS BACK. ZUMA enters frame on his hovercraft, eyes locked on the escaping Humbots.'},
+  {t:'noninteractive', x:'[ LETTERBOX OUT — Game Mode Begins ]'},
+  {t:'game', x:'🎮  GAME 1 — ZUMA: JET SKI CHASE'},
+  {t:'action', x:'Player tilts to steer Zuma\'s hovercraft down the jet ski course. Dodge buoys. Humbots glance back nervously as Zuma closes in.'},
+  {t:'game', x:'— RING TOSS MODE —'},
+  {t:'action', x:'Rocky\'s tugboat pulls up alongside Zuma. The Humbots panic and begin spinning in tight circles on their stolen jet skis.'},
+  {t:'action', x:'Player taps each circling Humbot to launch a ring from the front of Zuma\'s hovercraft. A direct hit: the Humbot freezes, eyes wide — then YOINK — yanked into the air and dropped into Rocky\'s tugboat.'},
+  {t:'character', x:'ROCKY'},
+  {t:'dialogue', x:'Don\'t lose it, reuse it!'},
+  {t:'action', x:'After 3-5 successful captures, MAYOR HUMDINGER watches from his lifeguard stand.'},
+  {t:'character', x:'MAYOR HUMDINGER'},
+  {t:'parenthetical', x:'(hollering from stand)'},
+  {t:'dialogue', x:'Humbots! Ditch the jet skis and HIDE!'},
+  {t:'game', x:'END GAME 1'},
+  {t:'transition', x:'CUT TO:'},
+  {t:'scene', x:'EXT. ADVENTURE BAY BEACH - MOMENTS LATER'},
+  {t:'action', x:'The remaining HUMBOTS beach the jet skis and scramble up the sand. They look left. They look right. Then they dig straight down into the beach. Within seconds, only their antennae are visible, poking up through the sand.'},
+  {t:'character', x:'RYDER'},
+  {t:'dialogue', x:'Rubble! They\'re buried on the beach — use your magnetic crane attachment!'},
+  {t:'game', x:'🎮  GAME 2 — RUBBLE: MAGNET WHACK-A-MOLE'},
+  {t:'action', x:'A 5x5 grid of sand mounds fills the screen. Rubble\'s magnetic crane hangs overhead, glowing with a soft purple light. Humbots peek up from random mounds, checking if the coast is clear.'},
+  {t:'action', x:'TAP a peeking Humbot → the magnet fires a beam downward → ZAP — the Humbot shoots straight up to the magnet, spring arms flailing. Miss and the Humbot ducks back down, laughing.'},
+  {t:'character', x:'MAYOR HUMDINGER'},
+  {t:'parenthetical', x:'(from lifeguard stand, watching)'},
+  {t:'dialogue', x:'Too slow! Ha ha ha!'},
+  {t:'action', x:'Round 1: 3x3 grid, 1 active Humbot. Round 2: 4x4 grid, 2 active. Round 3: full 5x5, 2-3 active, faster peek windows.'},
+  {t:'game', x:'END GAME 2'},
+  {t:'transition', x:'CUT TO:'},
+  {t:'scene', x:'EXT. ADVENTURE BAY BEACH - LIFEGUARD STAND - CONTINUOUS'},
+  {t:'action', x:'RYDER walks up to the base of the 12-foot lifeguard stand and looks up at HUMDINGER, who clings to his chair.'},
+  {t:'character', x:'RYDER'},
+  {t:'dialogue', x:'Humdinger — did YOU create these robots?'},
+  {t:'character', x:'MAYOR HUMDINGER'},
+  {t:'dialogue', x:'What!? Create the Humbots? I\'ve just been in this lifeguard stand the whole time trying to enjoy the jet ski race!'},
+  {t:'action', x:'Three HUMBOTS erupt from the sand at the base of the tower. They grab the support pieces from each 4-foot section — bottom, middle, top — and yank them free.'},
+  {t:'action', x:'The 12-foot lifeguard stand begins to sway. Left. Right. Left. Right. HUMDINGER grips his chair with both hands, crying. The tower rocks like a metronome.'},
+  {t:'character', x:'RYDER'},
+  {t:'dialogue', x:'Rocky! We need you!'},
+  {t:'game', x:'🎮  GAME 3 — ROCKY: FIX THE LIFEGUARD TOWER'},
+  {t:'action', x:'ROCKY stands on the beach below the swaying tower. His pup pack deploys — the retractable claw extends outward, ready. Three pieces lie in the sand nearby, each with a HUMBOT still clinging to it stubbornly.'},
+  {t:'action', x:'The tower sways continuously. HUMDINGER whimpers at the top. Each 4-foot section has a gap where its support piece belongs.'},
+  {t:'action', x:'BOTTOM PIECE (0-4 ft): Close range. Easy timing. Claw grabs piece — Humbot dangles, wriggling. Match shape to the gap in the bottom section. Piece snaps in. Humbot lets go and drops to beach. SPLAT. Stars circle its head.'},
+  {t:'action', x:'MIDDLE PIECE (4-8 ft): Claw extends further. Humbot grips tighter. Tower sways more. Match shape to middle section gap. Piece snaps in. Second Humbot drops. SPLAT.'},
+  {t:'action', x:'TOP PIECE (8-12 ft): Full extension. Biggest sway arc. Humbot clinging with all four spring arms. Match shape to top section gap. Piece snaps in. Third Humbot drops from 12 feet. SPLAT. Extra big stars.'},
+  {t:'action', x:'The tower steadies. HUMDINGER exhales and smooths his jacket with great dignity.'},
+  {t:'character', x:'ROCKY'},
+  {t:'dialogue', x:'There! Good as new. Better, actually — that middle piece is recycled from a surfboard.'},
+  {t:'game', x:'END GAME 3'},
+  {t:'transition', x:'CUT TO:'},
+  {t:'scene', x:'EXT. ADVENTURE BAY BEACH - CONTINUOUS'},
+  {t:'action', x:'The lifeguard stand stands perfectly straight. MAYOR GOODWAY arrives, fanning herself.'},
+  {t:'character', x:'MAYOR GOODWAY'},
+  {t:'dialogue', x:'Now THAT was a rescue worth watching!'},
+  {t:'character', x:'MAYOR HUMDINGER'},
+  {t:'dialogue', x:'Hmph. Well... I suppose... thank you.'},
+  {t:'action', x:'A lone HUMBOT pops up from the sand, clocks Humdinger\'s top hat, and snatches it. HUMDINGER yelps and leaps from the stand, chasing the Humbot down the beach.'},
+  {t:'action', x:'The pups watch and laugh.'},
+  {t:'character', x:'RYDER'},
+  {t:'dialogue', x:'Great work, team! No job is too big, no pup is too small!'},
+  {t:'transition', x:'CUT TO:'},
+  {t:'scene', x:'EXT. FOGGY BOTTOM - DOCK - MOMENTS LATER'},
+  {t:'action', x:'Rocky\'s tugboat chugs up to Foggy Bottom\'s dock. It tips its hold — a crate of captured HUMBOTS slides out and lands on the pier with a heavy THUNK.'},
+  {t:'action', x:'HUMDINGER walks up, hat now returned. He sees the crate. He opens it. Every single Humbot springs out at once and scatters through his lair in every direction.'},
+  {t:'action', x:'HUMDINGER stares. A long beat. Then: a slow, magnificent face-palm.'},
+  {t:'transition', x:'FADE OUT.'},
+  {t:'noninteractive', x:'[ MISSION COMPLETE — Adventure Bay Jet Ski Race ]'},
+];
+
+const TYPE_META = {
+  scene:          { label:'Scene Heading', key:'S', next:'action' },
+  action:         { label:'Action',        key:'A', next:'action' },
+  character:      { label:'Character',     key:'C', next:'dialogue' },
+  dialogue:       { label:'Dialogue',      key:'D', next:'action' },
+  parenthetical:  { label:'(Paren)',       key:'P', next:'dialogue' },
+  transition:     { label:'Transition',    key:'T', next:'scene' },
+  noninteractive: { label:'Non-Int',       key:'N', next:'action' },
+  game:           { label:'Game',          key:'G', next:'action' },
+};
+const TYPE_ORDER = Object.keys(TYPE_META);
+window._focusedSB = null;
+
+function renderMissionScript() {
+  const el = document.getElementById('tab-script');
+  el.innerHTML = `
+    <div class="script-toolbar" id="script-toolbar">
+      <span class="script-toolbar-label">ELEMENT:</span>
+      ${TYPE_ORDER.map(k => `<button class="script-type-btn" data-stype="${k}" title="${TYPE_META[k].label} [${TYPE_META[k].key}]" onclick="setSBType('${k}')">${TYPE_META[k].label}</button>`).join('')}
+      <div class="script-toolbar-sep"></div>
+      <button class="script-type-btn" onclick="insertSB('above')" title="Insert above">↑ Add</button>
+      <button class="script-type-btn" onclick="insertSB('below')" title="Insert below">↓ Add</button>
+      <button class="script-type-btn danger" onclick="deleteSB()" title="Delete block">✕ Delete</button>
+      <span class="script-toolbar-label" style="margin-left:.5rem">TAB=cycle type · ENTER=next block · BACKSPACE on empty=delete</span>
+    </div>
+    <div class="script-page-bg">
+      <div class="script-page">
+        <div class="script-title-block">
+          <h2>PAW PATROL: THE GAME</h2>
+          <p style="font-weight:bold">"Adventure Bay Jet Ski Race"</p>
+          <p>Mission 1 · Zuma, Rocky &amp; Rubble</p>
+          <p style="margin-top:.5rem;font-size:.75em;color:#999">Click any line to edit · Tab to change element type · Enter for next line</p>
+        </div>
+        <div id="script-blocks"></div>
+      </div>
+    </div>`;
+  const container = document.getElementById('script-blocks');
+  SCRIPT_DATA.forEach(b => container.appendChild(mkSB(b.t, b.x)));
+}
+
+function mkSB(type, text) {
+  const d = document.createElement('div');
+  d.className = 'sb sb-placeholder';
+  d.dataset.type = type;
+  d.contentEditable = 'true';
+  d.dataset.placeholder = TYPE_META[type]?.label || type;
+  if (type === 'game' && (text.startsWith('END') || text === '— RING TOSS MODE —')) d.classList.add('sb-end');
+  d.textContent = text || '';
+  d.addEventListener('focus', () => {
+    window._focusedSB = d;
+    document.querySelectorAll('.sb').forEach(b => b.classList.remove('focused'));
+    d.classList.add('focused');
+    updateSBToolbar(d.dataset.type);
+  });
+  d.addEventListener('input', () => {
+    // uppercase enforcement for character/transition/scene
+    if (['character','transition','scene'].includes(d.dataset.type)) {
+      const sel = window.getSelection();
+      const offset = sel.focusOffset;
+      d.textContent = d.textContent.toUpperCase();
+      try { const r = document.createRange(); r.setStart(d.firstChild||d, Math.min(offset, (d.firstChild?.length||0))); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); } catch(e){}
+    }
+  });
+  d.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const next = mkSB(TYPE_META[d.dataset.type]?.next || 'action', '');
+      d.parentNode.insertBefore(next, d.nextSibling);
+      next.focus();
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const idx = TYPE_ORDER.indexOf(d.dataset.type);
+      const nt = TYPE_ORDER[(idx + (e.shiftKey ? TYPE_ORDER.length - 1 : 1)) % TYPE_ORDER.length];
+      d.dataset.type = nt;
+      d.dataset.placeholder = TYPE_META[nt].label;
+      updateSBToolbar(nt);
+    } else if (e.key === 'Backspace' && d.textContent === '') {
+      e.preventDefault();
+      const prev = d.previousElementSibling || d.nextElementSibling;
+      d.remove();
+      if (prev) { prev.focus(); placeCursorAtEnd(prev); }
+      window._focusedSB = prev || null;
+    }
+  });
+  return d;
+}
+
+function placeCursorAtEnd(el) {
+  try { const r = document.createRange(), s = window.getSelection(); r.selectNodeContents(el); r.collapse(false); s.removeAllRanges(); s.addRange(r); } catch(e){}
+}
+function updateSBToolbar(active) {
+  document.querySelectorAll('.script-type-btn[data-stype]').forEach(b => b.classList.toggle('active', b.dataset.stype === active));
+}
+function setSBType(type) {
+  if (!window._focusedSB) return;
+  window._focusedSB.dataset.type = type;
+  window._focusedSB.dataset.placeholder = TYPE_META[type].label;
+  window._focusedSB.classList.remove('sb-end');
+  updateSBToolbar(type);
+  window._focusedSB.focus();
+}
+function insertSB(dir) {
+  const f = window._focusedSB; if (!f) return;
+  const nb = mkSB('action', '');
+  f.parentNode.insertBefore(nb, dir === 'above' ? f : f.nextSibling);
+  nb.focus();
+}
+function deleteSB() {
+  const f = window._focusedSB; if (!f) return;
+  const p = f.previousElementSibling || f.nextElementSibling;
+  f.remove(); window._focusedSB = p || null;
+  if (p) { p.focus(); placeCursorAtEnd(p); }
+}
+// Keyboard shortcuts for element types when a block is focused
+document.addEventListener('keydown', e => {
+  if (!window._focusedSB) return;
+  if (!e.altKey) return;
+  const match = Object.entries(TYPE_META).find(([,v]) => v.key === e.key.toUpperCase());
+  if (match) { e.preventDefault(); setSBType(match[0]); }
+});
+
+renderCards();
+renderMissions();
+renderHumbots();
+renderMissionScript();
+renderDesign();
+</script>
+</body>
+</html>
