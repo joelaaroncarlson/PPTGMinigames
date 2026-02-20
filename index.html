@@ -668,7 +668,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "action",
-    "x": "The Humbots turn toward the jet skis. They chant in perfect unison, marching."
+    "x": "5 Humbots bounce towards the jet skis, 5 go the other way. They chant in perfect unison, marching."
   },
   {
     "t": "character",
@@ -700,7 +700,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "dialogue",
-    "x": "Alright, contestant..."
+    "x": "Alright, contestants..."
   },
   {
     "t": "action",
@@ -724,7 +724,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "action",
-    "x": "The HUMBOTS speed away on stolen jet skis, laughing. One is surfing. One is bouncing. One is upside down. They keep chanting."
+    "x": "The HUMBOTS speed away on stolen jet skis, laughing. One is surfing on the seat. One is bouncing. One is upside down. They keep laughing."
   },
   {
     "t": "character",
@@ -732,7 +732,11 @@ const SCRIPT_DATA = [
   },
   {
     "t": "dialogue",
-    "x": "Steal everything! Steal everything!"
+    "x": "<robot laughter>"
+  },
+  {
+    "t": "action",
+    "x": "A puptag sfx is heard off screen"
   },
   {
     "t": "character",
@@ -760,7 +764,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "action",
-    "x": "Player touches/drags up or down on the screen to steer Zuma's hovercraft down the jet ski course. Buoys make Zuma slow down, jumps make him do cool tricks. Finger down makes zuma go faster. Zuma has a minimum speed. Zuma will always catch up to the humbots. There is no fail state. Once close enough the the letterbox closes in."
+    "x": "Player touches/drags up or down on the screen to steer Zuma's hovercraft down the jet ski course. Buoys make Zuma slow down, jumps make him do cool tricks. Finger down makes zuma go faster. Zuma has a minimum speed. Zuma will always catch up to the humbots even without player interaction. There is no fail state. Once close enough the the letterbox closes in and the camera trucks in on Zuma's face."
   },
   {
     "t": "noninteractive",
@@ -776,7 +780,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "dialogue",
-    "x": "Ryder! I've caught up to the robots!"
+    "x": "Ryder! I've caught up to these totally crazy robots!"
   },
   {
     "t": "character",
@@ -788,7 +792,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "dialogue",
-    "x": "Great work, Zuma! Rocky, get close to Zuma so he can use his buoy launcher to fling them into your Recycle Tugboat!"
+    "x": "Great work, Zuma! Rocky, get your tugboat close to Zuma so he can use his buoy launcher to fling the robots into it!"
   },
   {
     "t": "action",
@@ -800,7 +804,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "dialogue",
-    "x": "On it, Ryder!"
+    "x": "Green means go!"
   },
   {
     "t": "game",
@@ -828,27 +832,15 @@ const SCRIPT_DATA = [
   },
   {
     "t": "action",
-    "x": "After 3-5 successful captures, MAYOR HUMDINGER watches from his lifeguard stand."
-  },
-  {
-    "t": "character",
-    "x": "MAYOR HUMDINGER"
-  },
-  {
-    "t": "parenthetical",
-    "x": "(hollering from stand)"
-  },
-  {
-    "t": "dialogue",
-    "x": "Humbots! Ditch the jet skis and HIDE!"
+    "x": "After 5 successful captures, the ring toss game completes."
   },
   {
     "t": "game",
     "x": "END GAME 1"
   },
   {
-    "t": "transition",
-    "x": "CUT TO:"
+    "t": "noninteractive",
+    "x": "LETTERBOX IN"
   },
   {
     "t": "scene",
@@ -856,7 +848,31 @@ const SCRIPT_DATA = [
   },
   {
     "t": "action",
-    "x": "The remaining HUMBOTS beach the jet skis and scramble up the sand. They look left. They look right. Then they dig straight down into the beach. Within seconds, only their antennae are visible, poking up through the sand."
+    "x": "Humdinger sits on a lifeguard stand staring through binoculars at the PAW PATROL on the water."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Oh no. The PAW PATROL!"
+  },
+  {
+    "t": "action",
+    "x": "Pull out to show the humbots stealing sand toys."
+  },
+  {
+    "t": "character",
+    "x": "MAYOR HUMDINGER"
+  },
+  {
+    "t": "dialogue",
+    "x": "Okay. New plan, Humbots. HIDE!"
+  },
+  {
+    "t": "action",
+    "x": "The Humbots dig into the sand. Ryder's voice comes in o/s."
   },
   {
     "t": "character",
@@ -864,7 +880,23 @@ const SCRIPT_DATA = [
   },
   {
     "t": "dialogue",
-    "x": "Rubble! They're buried on the beach \u2014 use your magnetic crane attachment!"
+    "x": "Those robots are hiding under the sand! Rubble, use your magnet to pull them up!"
+  },
+  {
+    "t": "action",
+    "x": "A humbot pops up from the sand, looks around, then pops back down. Camera pulls back to reveal Rubble backing up his vehicle's electromagnet overhead."
+  },
+  {
+    "t": "character",
+    "x": "RUBBLE"
+  },
+  {
+    "t": "dialogue",
+    "x": "Rubble on the double!"
+  },
+  {
+    "t": "noninteractive",
+    "x": "(LETTERBOX OUT)"
   },
   {
     "t": "game",
@@ -872,7 +904,7 @@ const SCRIPT_DATA = [
   },
   {
     "t": "action",
-    "x": "A 5x5 grid of sand mounds fills the screen. Rubble's magnetic crane hangs overhead, glowing with a soft purple light. Humbots peek up from random mounds, checking if the coast is clear."
+    "x": "A 5x5 grid of sand mounds fills the screen. Rubble's magnetic crane hangs overhead, glowing with a soft purple light. Humbots peek up from random mounds, checking if the coast is clear and then ducking back down."
   },
   {
     "t": "action",
