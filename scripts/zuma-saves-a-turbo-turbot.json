@@ -2,6 +2,87 @@
   "id": "zuma-saves-a-turbo-turbot",
   "title": "Zuma saves a Turbo Turbot",
   "createdAt": "2026-03-11T00:43:28.665313Z",
-  "updatedAt": "2026-03-11T00:44:03.547641Z",
-  "blocks": []
+  "updatedAt": "2026-03-11T00:54:39.571842Z",
+  "blocks": [
+    {
+      "t": "scene",
+      "x": "1. EXT. ADVENTURE BAY BEACH"
+    },
+    {
+      "t": "action",
+      "x": "Fade in to see a nervous Francois holding his phone which is dialing. He grimaces as he looks out at the bay."
+    },
+    {
+      "t": "character",
+      "x": "DARING DANNY X"
+    },
+    {
+      "t": "parenthetical",
+      "x": "(o/s)"
+    },
+    {
+      "t": "dialogue",
+      "x": "THAT WAS SO EXTREME!"
+    },
+    {
+      "t": "action",
+      "x": "The phone clicks on."
+    },
+    {
+      "t": "character",
+      "x": "RYDER"
+    },
+    {
+      "t": "parenthetical",
+      "x": "(o/s)"
+    },
+    {
+      "t": "dialogue",
+      "x": "Hi, Francois!"
+    },
+    {
+      "t": "action",
+      "x": "Francois winces one last time out at the bay and looks down at his phone."
+    },
+    {
+      "t": "character",
+      "x": "FRANCOIS"
+    },
+    {
+      "t": "dialogue",
+      "x": "Oh, Ryder! I's a wee hard to explain, but my cousin is currently skiing around ze bay on Danny X's rocket skis."
+    },
+    {
+      "t": "character",
+      "x": "DARING DANNY X"
+    },
+    {
+      "t": "parenthetical",
+      "x": "(o/s)"
+    },
+    {
+      "t": "dialogue",
+      "x": "You mean, DARING Danny X!"
+    },
+    {
+      "t": "character",
+      "x": "RYDER"
+    },
+    {
+      "t": "parenthetical",
+      "x": "(o/s)"
+    },
+    {
+      "t": "dialogue",
+      "x": "No problem! Zuma's heading your way right now!"
+    },
+    {
+      "t": "scene",
+      "x": "2. EXT. ADVENTURE BAY"
+    },
+    {
+      "t": "action",
+      "x": "Cap'n Turbot is screaming at the top of his lungs."
+    }
+  ]
 }
