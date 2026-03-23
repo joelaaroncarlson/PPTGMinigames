@@ -159,6 +159,30 @@
   .sb-placeholder:empty:before { content: attr(data-placeholder); color: #bbb; pointer-events: none; font-style: italic; }
   .script-hint { text-align: center; margin-top: 1rem; font-size: .78rem; color: #9ca3af; font-family: 'Courier New'; }
 
+  /* ── Script Archive Layout ── */
+  .script-layout { display: flex; flex-direction: row; height: 100%; min-height: 600px; }
+  .script-archive { width: 240px; min-width: 200px; max-width: 240px; background: var(--card); border-right: 2px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .script-archive-header { padding: .65rem .75rem .4rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .script-archive-heading { font-size: .85rem; font-weight: 700; color: var(--text); }
+  .script-archive-new { padding: .25rem .5rem; font-size: .72rem; font-weight: 700; background: #1d4ed8; color: #fff; border: none; border-radius: .3rem; cursor: pointer; white-space: nowrap; }
+  .script-archive-new:hover { background: #2563eb; }
+  .script-archive-list { flex: 1; overflow-y: auto; padding: .3rem 0; }
+  .script-archive-item { display: flex; align-items: center; padding: .45rem .65rem; cursor: pointer; gap: .4rem; border-left: 3px solid transparent; transition: all .1s; }
+  .script-archive-item:hover { background: rgba(255,255,255,.05); }
+  .script-archive-item.active { background: rgba(96,165,250,.1); border-left-color: #60A5FA; }
+  .script-archive-item-info { flex: 1; min-width: 0; }
+  .script-archive-item-title { font-size: .78rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .script-archive-item-date { font-size: .68rem; color: var(--muted); margin-top: .1rem; }
+  .script-archive-item-del { background: none; border: none; color: #6b7280; cursor: pointer; font-size: .8rem; padding: .1rem .25rem; border-radius: .2rem; opacity: .6; flex-shrink: 0; }
+  .script-archive-item-del:hover { color: #f87171; opacity: 1; background: rgba(248,113,113,.1); }
+  .script-editor-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .script-title-input { width: 100%; box-sizing: border-box; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 1rem; font-weight: 700; font-family: 'Courier New', monospace; padding: .5rem .75rem; outline: none; }
+  .script-title-input:focus { border-bottom-color: #60A5FA; background: rgba(96,165,250,.05); }
+  .script-editor-scroll { flex: 1; overflow-y: auto; }
+  @media (max-width: 700px) {
+    .script-archive { width: 160px; min-width: 120px; max-width: 160px; }
+  }
+
   @media (max-width: 600px) {
     .grid { grid-template-columns: 1fr; }
     header h1 { font-size: 1.4rem; }
@@ -1343,6 +1367,9 @@ const SERVER = window.location.hostname !== 'joelaaroncarlson.github.io'
   : null;
 
 let _saveTimer = null;
+let _currentScriptId = null;
+let _currentScriptTitle = null;
+
 function getScriptBlocks() {
   return Array.from(document.querySelectorAll('#script-blocks .sb')).map(b => ({
     t: b.dataset.type, x: b.textContent
@@ -1352,6 +1379,29 @@ function setSaveStatus(msg, color) {
   const el = document.getElementById('save-status');
   if (el) { el.textContent = msg; el.style.color = color || ''; }
 }
+
+function saveCurrentScript(silent) {
+  if (!SERVER || !_currentScriptId) return Promise.resolve();
+  const title = document.getElementById('script-title-input')?.value || _currentScriptTitle || _currentScriptId;
+  const blocks = getScriptBlocks();
+  if (!silent) setSaveStatus('● saving…', '#fbbf24');
+  return fetch(SERVER + '/scripts/' + _currentScriptId, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ title, blocks })
+  }).then(r => r.json())
+    .then(d => {
+      if (!silent) setSaveStatus('● saved', '#86efac');
+      _currentScriptTitle = title;
+      // Refresh archive list title in sidebar
+      const item = document.querySelector(`.script-archive-item[data-id="${_currentScriptId}"] .script-archive-item-title`);
+      if (item) item.textContent = title;
+      localStorage.setItem('lastScriptId', _currentScriptId);
+    })
+    .catch(() => { if (!silent) setSaveStatus('● save failed', '#f87171'); });
+}
+
+// Legacy compatibility — keep /save working for old code paths
 function saveScriptState() {
   if (!SERVER) return;
   const blocks = getScriptBlocks();
@@ -1364,21 +1414,20 @@ function saveScriptState() {
     .then(() => setSaveStatus('● saved', '#86efac'))
     .catch(() => setSaveStatus('● save failed', '#f87171'));
 }
+
 function debounceSave() {
   clearTimeout(_saveTimer);
   setSaveStatus('● unsaved', '#fbbf24');
-  _saveTimer = setTimeout(saveScriptState, 1500);
+  _saveTimer = setTimeout(() => saveCurrentScript(), 1500);
 }
-function pushToGitHub() {
+
+function pushCurrentScript() {
   if (!SERVER) { alert('Push only works from the hosted version at 192.168.1.89:8090'); return; }
+  if (!_currentScriptId) { alert('No script loaded.'); return; }
   const btn = document.getElementById('push-btn');
   btn.textContent = '⏳ Pushing…'; btn.disabled = true;
-  // Save first, then push
-  fetch(SERVER + '/save', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(getScriptBlocks())
-  }).then(() => fetch(SERVER + '/push', { method: 'POST' }))
+  saveCurrentScript(true)
+    .then(() => fetch(SERVER + '/scripts/' + _currentScriptId + '/push', { method: 'POST' }))
     .then(r => r.json())
     .then(d => {
       if (d.ok) {
@@ -1390,55 +1439,227 @@ function pushToGitHub() {
       btn.textContent = '❌ Failed'; btn.disabled = false;
       setSaveStatus('● push failed', '#f87171');
       console.error(e);
-      setTimeout(() => btn.textContent = '🚀 Push to GitHub', 3000);
+      setTimeout(() => { btn.textContent = '🚀 Push to GitHub'; btn.disabled = false; }, 3000);
     });
+}
+
+// Legacy pushToGitHub kept for compatibility
+function pushToGitHub() { pushCurrentScript(); }
+
+function exportScriptPDF() {
+  if (!SERVER) { alert('PDF export only works from the hosted version at 192.168.1.89:8090'); return; }
+  if (!_currentScriptId) { alert('No script loaded.'); return; }
+  const btn = document.getElementById('pdf-btn');
+  btn.textContent = '⏳ Generating…'; btn.disabled = true;
+  // Save first so PDF reflects latest edits
+  saveCurrentScript(true).then(() => {
+    const url = SERVER + '/scripts/' + _currentScriptId + '/pdf';
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';   // server sets Content-Disposition filename
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => { btn.textContent = '📄 Export PDF'; btn.disabled = false; }, 2000);
+  }).catch(() => {
+    btn.textContent = '❌ Failed'; btn.disabled = false;
+    setTimeout(() => { btn.textContent = '📄 Export PDF'; btn.disabled = false; }, 2500);
+  });
+}
+
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'script';
+}
+
+function relDate(iso) {
+  if (!iso) return '';
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 2) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return days + 'd ago';
+  return new Date(iso).toLocaleDateString();
+}
+
+function loadScriptIntoEditor(script) {
+  _currentScriptId = script.id;
+  _currentScriptTitle = script.title || script.id;
+  localStorage.setItem('lastScriptId', script.id);
+
+  // Update title input
+  const titleInput = document.getElementById('script-title-input');
+  if (titleInput) titleInput.value = _currentScriptTitle;
+
+  // Update sidebar active state
+  document.querySelectorAll('.script-archive-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === script.id);
+  });
+
+  // Load blocks
+  const container = document.getElementById('script-blocks');
+  if (!container) return;
+  container.innerHTML = '';
+  (script.blocks || []).forEach(b => container.appendChild(mkSB(b.t, b.x)));
+  setSaveStatus('● saved', '#86efac');
+
+  // Auto-focus first block if it's empty (new script)
+  const firstBlock = container.querySelector('.sb-text');
+  if (firstBlock && !firstBlock.textContent.trim()) {
+    setTimeout(() => { firstBlock.focus(); }, 80);
+  }
+}
+
+function fetchAndLoadScript(id) {
+  if (!SERVER) return;
+  setSaveStatus('● loading…', '#fbbf24');
+  fetch(SERVER + '/scripts/' + id)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data) loadScriptIntoEditor(data);
+      else setSaveStatus('● not found', '#f87171');
+    })
+    .catch(() => setSaveStatus('● load failed', '#f87171'));
+}
+
+function renderArchiveList(scripts) {
+  const list = document.getElementById('script-archive-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!scripts.length) {
+    list.innerHTML = '<div style="padding:.75rem;color:var(--muted);font-size:.78rem">No scripts yet</div>';
+    return;
+  }
+  scripts.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'script-archive-item' + (s.id === _currentScriptId ? ' active' : '');
+    item.dataset.id = s.id;
+    item.innerHTML = `
+      <div class="script-archive-item-info">
+        <div class="script-archive-item-title">${s.title || s.id}</div>
+        <div class="script-archive-item-date">${relDate(s.updatedAt)}</div>
+      </div>
+      <button class="script-archive-item-del" title="Delete script" data-del="${s.id}">🗑️</button>`;
+    item.querySelector('.script-archive-item-info').addEventListener('click', () => {
+      if (s.id === _currentScriptId) return;
+      saveCurrentScript(true).then(() => fetchAndLoadScript(s.id));
+    });
+    item.querySelector('[data-del]').addEventListener('click', e => {
+      e.stopPropagation();
+      if (!confirm(`Delete "${s.title || s.id}"? This cannot be undone.`)) return;
+      fetch(SERVER + '/scripts/' + s.id, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(d => {
+          if (d.ok) {
+            item.remove();
+            if (s.id === _currentScriptId) {
+              // Load first remaining script or clear
+              const remaining = document.querySelector('.script-archive-item');
+              if (remaining) fetchAndLoadScript(remaining.dataset.id);
+              else {
+                _currentScriptId = null;
+                _currentScriptTitle = null;
+                document.getElementById('script-blocks').innerHTML = '';
+                const ti = document.getElementById('script-title-input');
+                if (ti) ti.value = '';
+              }
+            }
+          }
+        });
+    });
+    list.appendChild(item);
+  });
+}
+
+function fetchArchiveList(thenLoad) {
+  if (!SERVER) return;
+  fetch(SERVER + '/scripts')
+    .then(r => r.json())
+    .then(scripts => {
+      renderArchiveList(scripts);
+      if (thenLoad && scripts.length) {
+        const lastId = localStorage.getItem('lastScriptId');
+        const target = (lastId && scripts.find(s => s.id === lastId)) ? lastId : scripts[0].id;
+        fetchAndLoadScript(target);
+      }
+    })
+    .catch(e => console.error('Failed to load scripts list', e));
+}
+
+function newScript() {
+  const title = prompt('Script title:');
+  if (!title || !title.trim()) return;
+  const id = slugify(title.trim());
+  if (!SERVER) { alert('Requires server.'); return; }
+  saveCurrentScript(true).then(() => {
+    fetch(SERVER + '/scripts/' + id, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ title: title.trim(), blocks: [{ t: 'action', x: '' }] })
+    }).then(r => r.json()).then(d => {
+      if (d.ok) {
+        fetchArchiveList(false);
+        fetchAndLoadScript(id);
+      }
+    });
+  });
 }
 
 function renderMissionScript() {
   const el = document.getElementById('tab-script');
   el.innerHTML = `
-    <div class="script-toolbar" id="script-toolbar">
-      <span class="script-toolbar-label">ELEMENT:</span>
-      ${TYPE_ORDER.map(k => `<button class="script-type-btn" data-stype="${k}" title="${TYPE_META[k].label} [${TYPE_META[k].key}]" onclick="setSBType('${k}')">${TYPE_META[k].label}</button>`).join('')}
-      <div class="script-toolbar-sep"></div>
-      <button class="script-type-btn" onclick="insertSB('above')" title="Insert above">↑ Add</button>
-      <button class="script-type-btn" onclick="insertSB('below')" title="Insert below">↓ Add</button>
-      <button class="script-type-btn danger" onclick="deleteSB()" title="Delete block">✕ Delete</button>
-      <div class="script-toolbar-sep"></div>
-      <span id="save-status" class="script-toolbar-label" style="min-width:80px">● saved</span>
-      <button class="script-type-btn" id="push-btn" style="background:#14532d;color:#86efac;border-color:#166534;font-weight:700" onclick="pushToGitHub()">🚀 Push to GitHub</button>
-      <span class="script-toolbar-label" style="margin-left:.5rem;opacity:.5">TAB=cycle · ENTER=next · BKSP on empty=delete</span>
-    </div>
-    <div class="script-page-bg">
-      <div class="script-page">
-        <div class="script-title-block">
-          <h2>PAW PATROL: THE GAME</h2>
-          <p style="font-weight:bold">"Adventure Bay Jet Ski Race"</p>
-          <p>Mission 1 · Zuma, Rocky &amp; Rubble</p>
-          <p style="margin-top:.5rem;font-size:.75em;color:#999">Click any line to edit · Tab to change element type · Enter for next line</p>
+    <div class="script-layout">
+      <div class="script-archive" id="script-archive-panel">
+        <div class="script-archive-header">
+          <span class="script-archive-heading">📜 Scripts</span>
+          <button class="script-archive-new" onclick="newScript()">＋ New Script</button>
         </div>
-        <div id="script-blocks"></div>
+        <div class="script-archive-list" id="script-archive-list"></div>
+      </div>
+      <div class="script-editor-panel">
+        <input id="script-title-input" class="script-title-input" type="text" placeholder="Script title…" oninput="debounceSave()" />
+        <div class="script-toolbar" id="script-toolbar">
+          <span class="script-toolbar-label">ELEMENT:</span>
+          ${TYPE_ORDER.map(k => `<button class="script-type-btn" data-stype="${k}" title="${TYPE_META[k].label} [${TYPE_META[k].key}]" onclick="setSBType('${k}')">${TYPE_META[k].label}</button>`).join('')}
+          <div class="script-toolbar-sep"></div>
+          <button class="script-type-btn" onclick="insertSB('above')" title="Insert above">↑ Add</button>
+          <button class="script-type-btn" onclick="insertSB('below')" title="Insert below">↓ Add</button>
+          <button class="script-type-btn danger" onclick="deleteSB()" title="Delete block">✕ Delete</button>
+          <div class="script-toolbar-sep"></div>
+          <span id="save-status" class="script-toolbar-label" style="min-width:80px">● loading…</span>
+          <button class="script-type-btn" id="save-btn" style="background:#1e3a5f;color:#93c5fd;border-color:#1d4ed8;font-weight:700" onclick="saveCurrentScript()">💾 Save</button>
+          <button class="script-type-btn" id="push-btn" style="background:#14532d;color:#86efac;border-color:#166534;font-weight:700" onclick="pushCurrentScript()">🚀 Push to GitHub</button>
+          <button class="script-type-btn" id="pdf-btn" style="background:#451a03;color:#fed7aa;border-color:#c2410c;font-weight:700" onclick="exportScriptPDF()">📄 Export PDF</button>
+          <span class="script-toolbar-label" style="margin-left:.5rem;opacity:.5">TAB=cycle · ENTER=next · BKSP on empty=delete</span>
+        </div>
+        <div class="script-editor-scroll">
+          <div class="script-page-bg">
+            <div class="script-page">
+              <div class="script-title-block">
+                <h2>PAW PATROL: THE GAME</h2>
+                <p style="margin-top:.5rem;font-size:.75em;color:#999">Click any line to edit · Tab to change element type · Enter for next line</p>
+              </div>
+              <div id="script-blocks"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>`;
-  const container = document.getElementById('script-blocks');
 
-  // Try to restore saved state from server, fall back to hardcoded SCRIPT_DATA
-  const loadBlocks = (data) => {
-    container.innerHTML = '';
-    data.forEach(b => container.appendChild(mkSB(b.t, b.x)));
-    // Wire auto-save to every block
-    container.addEventListener('input', debounceSave);
-    if (!SERVER) setSaveStatus('● github pages', '#94a3b8');
-  };
+  // Wire auto-save
+  document.getElementById('script-blocks').addEventListener('input', debounceSave);
 
   if (SERVER) {
-    setSaveStatus('● loading…', '#fbbf24');
-    fetch(SERVER + '/state')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => loadBlocks(data && data.length ? data : SCRIPT_DATA))
-      .catch(() => loadBlocks(SCRIPT_DATA));
+    fetchArchiveList(true);
   } else {
-    loadBlocks(SCRIPT_DATA);
+    // Fallback: load hardcoded SCRIPT_DATA
+    const container = document.getElementById('script-blocks');
+    SCRIPT_DATA.forEach(b => container.appendChild(mkSB(b.t, b.x)));
+    const ti = document.getElementById('script-title-input');
+    if (ti) ti.value = 'Adventure Bay Jet Ski Race';
+    setSaveStatus('● github pages', '#94a3b8');
   }
 }
 
